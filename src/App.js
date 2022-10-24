@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import papers from "./papers.json";
 
 import {
   LeadingActions,
@@ -13,10 +12,20 @@ import "react-swipeable-list/dist/styles.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
-import Card from "./components/Card";
+import ArticleCard from "./components/ArticleCard";
 
 class App extends Component {
-  state = papers;
+  state = { papers: [] };
+
+  componentDidMount() {
+    fetch("https://react-papers-default-rtdb.firebaseio.com/papers.json")
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        this.setState({ papers: data });
+      });
+  }
 
   leadingActions = (e) => (
     <LeadingActions>
@@ -46,7 +55,7 @@ class App extends Component {
             leadingActions={this.leadingActions(paper)}
             trailingActions={this.trailingActions(paper)}
           >
-            <Card
+            <ArticleCard
               title={paper.title}
               abstract={paper.abstract}
               avatar={paper.avatar}

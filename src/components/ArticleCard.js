@@ -1,10 +1,10 @@
 import React from "react";
-import "./Card.css";
+import "./ArticleCard.css";
 
-const card = ({ title, avatar, abstract, authors }) => (
+const ArticleCard = ({ title, avatar, abstract, authors }) => (
   <div className="card card-custom bg-white border-white border-0">
     <div className="card-custom-img"></div>
-    <div className="card-custom-avatar">
+    <div className="card-avatar">
       <img className="img-fluid" src={avatar} alt="Avatar" />
     </div>
     <div className="card-body" style={{ overflowY: "auto" }}>
@@ -16,14 +16,14 @@ const card = ({ title, avatar, abstract, authors }) => (
       className="card-footer"
       style={{ background: "inherit", borderColor: "inherit" }}
     >
-      <a href="#" className="btn btn-primary">
-        Option
+      <a href="#" className="btn btn-primary mx-2">
+        View PDF
       </a>
-      <a href="#" className="btn btn-outline-primary">
-        Other option
+      <a href="#" className="btn btn-outline-primary mx-2">
+        Open abstract
       </a>
     </div>
   </div>
 );
 
-export default card;
+export default ArticleCard;
