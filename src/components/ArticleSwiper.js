@@ -10,11 +10,11 @@ import {
 
 import "react-swipeable-list/dist/styles.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./App.css";
+import "./ArticleSwiper.css";
 
-import ArticleCard from "./components/ArticleCard";
+import ArticleCard from "./ArticleCard";
 
-class App extends Component {
+export default class ArticleSwiper extends Component {
   state = { papers: [] };
 
   componentDidMount() {
@@ -67,5 +67,3 @@ class App extends Component {
     );
   }
 }
-
-export default App;
