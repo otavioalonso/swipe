@@ -1,13 +1,13 @@
 import React from "react";
-import Signup from "./Signup";
+import SignUp from "./SignUp";
 import { AuthProvider } from "../contexts/AuthContext";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./Login";
+import LogIn from "./LogIn";
 import PrivateRoute from "./PrivateRoute";
 import ForgotPassword from "./ForgotPassword";
 import UpdateProfile from "./UpdateProfile";
-import ArticleSwiper from "./ArticleSwiper";
 import AccountPage from "./AccountPage";
+import Dashboard from "./Dashboard";
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
             path="/"
             element={
               <PrivateRoute>
-                <ArticleSwiper />
+                <Dashboard />
               </PrivateRoute>
             }
           />
@@ -37,7 +37,7 @@ function App() {
             path="/signup"
             element={
               <AccountPage>
-                <Signup />
+                <SignUp />
               </AccountPage>
             }
           />
@@ -45,7 +45,7 @@ function App() {
             path="/login"
             element={
               <AccountPage>
-                <Login />
+                <LogIn />
               </AccountPage>
             }
           />

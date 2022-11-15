@@ -1,0 +1,39 @@
+{
+  
+  "feed": {
+
+    "PUBD0hc19Se2UBOTziaQs7fFgWD2": {
+        "inbox": {
+          "2210-09327": {
+          "abstract": "Spectral distortions of the cosmic microwave background (CMB) have been recognized as an important future probe of the early Universe. Existing theoretical studies primarily focused on describing the evolution and creation of average distortions, ignoring spatial perturbations in the plasma. One of the main reasons for this choice is that a treatment of the spectro-spatial evolution of the photon field deep into the primordial Universe requires solving a radiative transfer problem for the distortion signals, which in full detail is computationally challenging. Here we provide the first crucial step towards tackling this problem by formulating a new spectral discretisation of the underlying average thermalisation Green's function. Our approach allows us to convert the high-dimensional partial differential equation system (~1,000-10,000 equations) into and set of ordinary differential equations of much lower dimension (~10 equations). We demonstrate the precision of the approach and highlight how it may be further improved in the future. We also clarify the link of the observable spectral distortion parameters (e.g., mu and y) to the computational spectral basis that we use in our frequency discretisation. This reveals how several basis-dependent ambiguities can be interpreted in future CMB analysis. Even if not exact, the new Green's function discretisation can be used to formulate a generalised photon Boltzmann-hierarchy, which can then be solved with methods that are familiar from theoretical studies of the CMB temperature and polarisation anisotropies. We will carry this program out in a series of companion papers, thereby opening the path to full spectro-spatial exploration of the CMB with future CMB imagers and spectrometers.",
+          "arxiv": "2210.09327",
+          "authors": "Jens Chluba, Thomas Kite, Andrea Ravenni",
+          "avatar": "https://static.vecteezy.com/system/resources/previews/004/980/452/non_2x/astrophysics-blue-violet-flat-design-long-shadow-glyph-icon-astronomy-branch-study-of-universe-stars-planets-galaxies-astrophysical-discoveries-cosmology-silhouette-illustration-vector.jpg",
+          "title": "Spectro-spatial evolution of the CMB I: discretisation of the thermalisation Green's function"
+        },
+        "2210-09487": {
+          "abstract": "Fast cosmological transients such as fast radio bursts (FRBs) and gamma-ray bursts (GRBs) represent a class of sources more compact than any other cosmological object. As such they are sensitive to significant magnification via gravitational lensing from a class of lenses which are not well-constrained by observations today. Low-mass primordial black holes are one such candidate which may constitute a significant fraction of the Universe's dark matter. Current observations only constrain their density in the nearby Universe, giving fast transients from cosmological distances the potential to form complementary constraints. Motivated by this, we calculate the effect that gravitational lensing from a cosmological distribution of compact objects would have on the observed rates of FRBs and GRBs. For static lensing geometries, we rule out the prospect that all FRBs are gravitationally lensed for a range of lens masses and show that lens masses greater than 10−5M⊙ can be constrained with 8000 un-localised high fluence FRBs at 1.4GHz, as might be detected by the next generation of FRB-finding telescopes.",
+          "arxiv": "2210.09487",
+          "authors": "Mawson W. Sammons, Clancy W. James, Cathryn M. Trott, Mark Walker",
+          "avatar": "https://static.vecteezy.com/system/resources/previews/004/980/452/non_2x/astrophysics-blue-violet-flat-design-long-shadow-glyph-icon-astronomy-branch-study-of-universe-stars-planets-galaxies-astrophysical-discoveries-cosmology-silhouette-illustration-vector.jpg",
+          "title": "The Effect of Gravitational Lensing on Fast Transient Event Rates"
+        },
+        "2210-09493": {
+          "abstract": "Dark matter could comprise, at least in part, primordial black holes (PBH). To test this hypothesis, we present an approach to constrain the PBH mass (MPBH) and mass fraction (fPBH) from the flux ratios of quadruply imaged quasars. Our approach uses an approximate Bayesian computation (ABC) forward modeling technique to directly sample the posterior distribution of MPBH and fPBH, while marginalizing over the subhalo mass function amplitude, spatial distribution, and the size of the lensed source. We apply our method to 11 quadruply-imaged quasars and derive a new constraint on the intermediate-mass area of PBH parameter space 104M⊙<MPBH<106M⊙. We obtain an upper limit fPBH<0.17 (95% C.L.). This constraint is independent of all other previously published limits.",
+          "arxiv": "2210.09493",
+          "authors": "Veronica Dike, Daniel Gilman, Tommaso Treu",
+          "avatar": "https://static.vecteezy.com/system/resources/previews/004/980/452/non_2x/astrophysics-blue-violet-flat-design-long-shadow-glyph-icon-astronomy-branch-study-of-universe-stars-planets-galaxies-astrophysical-discoveries-cosmology-silhouette-illustration-vector.jpg",
+          "title": "Strong lensing constraints on primordial black holes as a dark matter candidate"
+        },
+        "2210-09530": {
+          "abstract": "The cluster mass-richness relation (MRR) is an observationally efficient and potentially powerful cosmological tool for constraining the mean matter density of the universe and the amplitude of fluctuations using the cluster abundance technique. We derive the MRR relation using GalWCat19, a publicly available galaxy cluster catalog we created from the Sloan Digital Sky Survey-DR13 spectroscopic dataset. The MRR shows a tail at the low-richness end. Using the Illustris-TNG and mini-Uchuu cosmological numerical simulations, we demonstrate that this tail is caused by systematical uncertainties. We show that, by means of a judicious cut, identified by the use of the Hinge function, it is possible to determine a richness threshold above which the MRR is linear i.e., where cluster mass scales with richness as logM_200 = alpha + beta logN_200. We derive the MRR and show it is consistent with both sets of simulations with a slope of beta ~ 1. We use our MRR to estimate cluster masses from the GalWCat19 catalog which we then use to set constraints on omega_m and sigma_8. Utilizing the all-member MRR, we obtain constraints of omega_m = 0.31 (+0.04-0.03) and sigma_8 = 0.82 (+0.05-0.04), and utilizing the red-member MRR, we obtain omega_m = 0.31 (+0.04-0.03) and sigma_8 = 0.81 (+0.05-0.04). Our constraints on omega_m and sigma_8 are consistent and very competitive with the Planck 2018 results.",
+          "arxiv": "2210.09530",
+          "authors": "Mohamed H. Abdullah, Gillian Wilson, Anatoly Klypin, Tomoaki Ishiyama",
+          "avatar": "https://static.vecteezy.com/system/resources/previews/004/980/452/non_2x/astrophysics-blue-violet-flat-design-long-shadow-glyph-icon-astronomy-branch-study-of-universe-stars-planets-galaxies-astrophysical-discoveries-cosmology-silhouette-illustration-vector.jpg",
+          "title": "Constraining Cosmological Parameters using the Cluster Mass-Richness Relation"
+        }
+      }
+    }
+    
+  }
+}

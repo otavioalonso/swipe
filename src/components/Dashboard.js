@@ -1,7 +1,17 @@
 import React, { useState } from "react";
-import { Card, Button, Alert } from "react-bootstrap";
+import {
+  Card,
+  Button,
+  Alert,
+  Navbar,
+  Nav,
+  NavItem,
+  Container,
+} from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
+
+import ArticleSwiper from "./ArticleSwiper";
 
 export default function Dashboard() {
   const [error, setError] = useState("");
@@ -21,21 +31,26 @@ export default function Dashboard() {
 
   return (
     <>
-      <Card>
-        <Card.Body>
-          <h2 className="text-center mb-4">Profile</h2>
-          {error && <Alert variant="danger">{error}</Alert>}
-          <strong>Email:</strong> {currentUser.email}
-          <Link to="/update-profile" className="btn btn-primary w-100 mt-3">
+      <Navbar bg="light" expand="lg">
+        <Nav>
+          {/* <NavItem eventKey={1} href="#">
+            Link
+          </NavItem>
+          <NavItem eventKey={2} href="#">
+            Link
+          </NavItem> */}
+          <h6>
+            <strong>User:</strong> {currentUser.email}
+          </h6>
+          <Link to="/update-profile" className="btn btn-primary mx-2">
             Update Profile
           </Link>
-        </Card.Body>
-      </Card>
-      <div className="w-100 text-center mt-2">
-        <Button variant="link" onClick={handleLogout}>
-          Log Out
-        </Button>
-      </div>
+          <Button className="btn btn-primary mx-2" onClick={handleLogout}>
+            Log Out
+          </Button>
+        </Nav>
+      </Navbar>
+      <ArticleSwiper />
     </>
   );
 }

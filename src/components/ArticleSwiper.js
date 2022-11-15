@@ -1,4 +1,7 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
+import { set, get, ref, onValue, remove, update } from "firebase/database";
+import { useAuth } from "../contexts/AuthContext";
+import { db } from "../firebase.js";
 
 import {
   LeadingActions,
@@ -14,56 +17,85 @@ import "./ArticleSwiper.css";
 
 import ArticleCard from "./ArticleCard";
 
-export default class ArticleSwiper extends Component {
-  state = { papers: [] };
+export default function ArticleSwiper() {
+  const [papers, setPapers] = useState([]);
 
-  componentDidMount() {
-    fetch("https://react-papers-default-rtdb.firebaseio.com/papers.json")
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        this.setState({ papers: data });
-      });
+  const { currentUser } = useAuth();
+
+  useEffect(() => {
+    onValue(
+      ref(db, `/feed/${currentUser.uid}/inbox`),
+      (snapshot) => {
+        const data = snapshot.val();
+        console.log("refresh", data);
+        if (data !== null) {
+          setPapers(Object.values(data));
+        }
+      },
+      { onlyOnce: true }
+    );
+  }, []);
+
+  function deletePaper(arxiv_number) {
+    const aid = arxiv_number.replace(".", "-");
+    console.log("removing", aid);
+    remove(ref(db, `/feed/${currentUser.uid}/inbox/${aid}`));
   }
 
-  leadingActions = (e) => (
-    <LeadingActions>
-      <SwipeAction destructive={true} onClick={() => console.info("saved", e)}>
-        <span></span>
-      </SwipeAction>
-    </LeadingActions>
-  );
+  function moveRef(oldRef, newRef) {
+    get(oldRef).then((snap) => {
+      if (snap.exists()) {
+        set(newRef, snap.val());
+        remove(oldRef);
+      }
+    });
+  }
 
-  trailingActions = (e) => (
-    <TrailingActions>
-      <SwipeAction
-        destructive={true}
-        onClick={() => console.info("discarded", e)}
-      >
-        <span></span>
-      </SwipeAction>
-    </TrailingActions>
-  );
-
-  render() {
-    return (
-      <SwipeableList fullSwipe threshold={0.2}>
-        {this.state.papers.map((paper) => (
-          <SwipeableListItem
-            key={paper.arxiv}
-            leadingActions={this.leadingActions(paper)}
-            trailingActions={this.trailingActions(paper)}
-          >
-            <ArticleCard
-              title={paper.title}
-              abstract={paper.abstract}
-              avatar={paper.avatar}
-              authors={paper.authors}
-            />
-          </SwipeableListItem>
-        ))}
-      </SwipeableList>
+  function archivePaper(arxiv_number) {
+    const aid = arxiv_number.replace(".", "-");
+    console.log("saving", arxiv_number);
+    moveRef(
+      ref(db, `/feed/${currentUser.uid}/inbox/${aid}`),
+      ref(db, `/feed/${currentUser.uid}/archive/${aid}`)
     );
   }
+
+  function leadingActions(e) {
+    return (
+      <LeadingActions>
+        <SwipeAction destructive={true} onClick={() => archivePaper(e.arxiv)}>
+          <span></span>
+        </SwipeAction>
+      </LeadingActions>
+    );
+  }
+
+  function trailingActions(e) {
+    return (
+      <TrailingActions>
+        <SwipeAction destructive={true} onClick={() => deletePaper(e.arxiv)}>
+          <span></span>
+        </SwipeAction>
+      </TrailingActions>
+    );
+  }
+
+  return (
+    <SwipeableList fullSwipe threshold={0.2}>
+      {papers.map((paper) => (
+        <SwipeableListItem
+          key={paper.arxiv}
+          leadingActions={leadingActions(paper)}
+          trailingActions={trailingActions(paper)}
+        >
+          <ArticleCard
+            title={paper.title}
+            abstract={paper.abstract}
+            avatar={paper.avatar}
+            authors={paper.authors}
+          />
+        </SwipeableListItem>
+      ))}
+    </SwipeableList>
+  );
 }
