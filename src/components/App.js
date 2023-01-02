@@ -8,7 +8,6 @@ import ForgotPassword from "./ForgotPassword";
 import UpdateProfile from "./UpdateProfile";
 import AccountPage from "./AccountPage";
 import Dashboard from "./Dashboard";
-import Rss from "./Rss";
 
 function App() {
   return (
