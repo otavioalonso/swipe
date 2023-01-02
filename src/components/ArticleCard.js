@@ -1,7 +1,13 @@
 import React from "react";
 import "./ArticleCard.css";
 
-export default function ArticleCard({ title, avatar, abstract, authors }) {
+export default function ArticleCard({
+  title,
+  avatar,
+  abstract,
+  authors,
+  arxiv,
+}) {
   return (
     <div className="card bg-white border-white border-0">
       <div className="card-img"></div>
@@ -14,11 +20,19 @@ export default function ArticleCard({ title, avatar, abstract, authors }) {
         <p className="card-text">{abstract}</p>
       </div>
       <div className="card-footer">
-        <a href="#" className="btn btn-primary mx-2">
+        <a
+          href={`https://arxiv.org/pdf/${arxiv}`}
+          className="btn btn-primary mx-2"
+          target="_blank"
+        >
           View PDF
         </a>
-        <a href="#" className="btn btn-outline-primary mx-2">
-          Open abstract
+        <a
+          href={`https://arxiv.org/abs/${arxiv}`}
+          className="btn btn-outline-primary mx-2"
+          target="_blank"
+        >
+          Open on arXiv
         </a>
       </div>
     </div>

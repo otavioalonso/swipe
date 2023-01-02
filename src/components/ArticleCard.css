@@ -11,6 +11,11 @@ h6.card-text {
     font-weight: bold;
 }
 
+p.card-text {
+    max-height: 1500px;
+    overflow-y: auto;
+}
+
 .card-img {
     height: 200px;
     min-height: 200px;

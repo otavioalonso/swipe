@@ -168,6 +168,7 @@ export default function ArticleSwiper() {
               abstract={article.abstract}
               avatar={article.avatar}
               authors={article.authors}
+              arxiv={article.arxiv}
             />
           </SwipeableListItem>
         ))}
