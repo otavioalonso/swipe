@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
-// import { set, get, ref, onValue, remove, update } from "firebase/database";
+
 import {
   doc,
   getDocs,
+  getDoc,
   collection,
   query,
   orderBy,
   startAfter,
   limit,
+  setDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
 import { db } from "../firebase.js";
@@ -24,11 +27,14 @@ import useInfiniteScroll from "./InfiniteScroll";
 
 import "react-swipeable-list/dist/styles.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { Button } from "react-bootstrap";
 import "./ArticleSwiper.css";
 
 import ArticleCard from "./ArticleCard";
 
-const cardsPerScroll = 2;
+const cardsPerScroll = 10;
+const arxivQuery =
+  "https://export.arxiv.org/api/query?search_query=cat:astro-ph.CO&sortBy=submittedDate&max_results=100";
 
 export default function ArticleSwiper() {
   const [articles, setArticles] = useState([]);
@@ -55,45 +61,75 @@ export default function ArticleSwiper() {
       } else {
         setArticles((prev) => [
           ...(articles.length ? prev : []),
-          ...res.docs.map((d) => ({ id: d.id, ...d.data() })),
+          ...res.docs.map((d) => d.data()),
         ]);
       }
       setIsFetching(false);
     });
   }
 
-  function deleteArticle(arxiv_number) {
-    // const aid = arxiv_number.replace(".", "-");
-    // console.log("removing", aid);
-    // remove(ref(db, `/feed/${currentUser.uid}/inbox/${aid}`));
+  function addArticle(article, folder) {
+    setDoc(
+      doc(
+        db,
+        "users",
+        currentUser.uid,
+        folder,
+        article.arxiv.replace(".", "-")
+      ),
+      article
+    );
   }
 
-  function moveRef(oldRef, newRef) {
-    // get(oldRef).then((snap) => {
-    //   if (snap.exists()) {
-    //     set(newRef, snap.val());
-    //     remove(oldRef);
-    //   }
-    // });
+  function deleteArticle(article, folder) {
+    deleteDoc(
+      doc(db, "users", currentUser.uid, folder, article.arxiv.replace(".", "-"))
+    );
   }
 
-  function archiveArticle(arxiv_number) {
-    // const aid = arxiv_number.replace(".", "-");
-    // console.log("saving", arxiv_number);
-    // moveRef(
-    //   ref(db, `/feed/${currentUser.uid}/inbox/${aid}`),
-    //   ref(db, `/feed/${currentUser.uid}/archive/${aid}`)
-    // );
+  function importNewArticles() {
+    setHasMore(true);
+    setArticles([]);
+    return fetch(arxivQuery).then((res) => {
+      res.text().then((content) => {
+        const xml = new window.DOMParser().parseFromString(content, "text/xml");
+        const articles = [...xml.querySelectorAll("entry")].map((entry) => ({
+          arxiv: entry.querySelector("id").innerHTML.match(/\d{4}\.\d{3,6}/)[0],
+          title: entry.querySelector("title").innerHTML.trim(),
+          abstract: entry.querySelector("summary").innerHTML.trim(),
+          authors: [...entry.querySelectorAll("author")]
+            .map((author) => author.querySelector("name").innerHTML.trim())
+            .join(", "),
+          avatar:
+            "https://static.vecteezy.com/system/resources/previews/004/980/452/non_2x/astrophysics-blue-violet-flat-design-long-shadow-glyph-icon-astronomy-branch-study-of-universe-stars-planets-galaxies-astrophysical-discoveries-cosmology-silhouette-illustration-vector.jpg",
+        }));
+        console.log("Importing articles", articles);
+        articles.map((article) => {
+          addArticle(article, "inbox");
+        });
+        fetchMoreArticles();
+        return articles;
+      });
+    });
   }
 
-  function leadingActions(e) {
+  function archiveArticle(article) {
+    addArticle(article, "archive");
+    deleteArticle(article, "inbox");
+  }
+
+  function discardArticle(article) {
+    deleteArticle(article, "inbox");
+  }
+
+  function leadingActions(article) {
     return (
       <LeadingActions>
         <SwipeAction
           destructive={true}
           onClick={() => {
             window.dispatchEvent(new Event("scroll"));
-            return archiveArticle(e.id);
+            return archiveArticle(article);
           }}
         >
           <span></span>
@@ -102,14 +138,14 @@ export default function ArticleSwiper() {
     );
   }
 
-  function trailingActions(e) {
+  function trailingActions(article) {
     return (
       <TrailingActions>
         <SwipeAction
           destructive={true}
           onClick={() => {
             window.dispatchEvent(new Event("scroll"));
-            return deleteArticle(e.id);
+            return discardArticle(article);
           }}
         >
           <span></span>
@@ -123,7 +159,7 @@ export default function ArticleSwiper() {
       <SwipeableList fullSwipe threshold={0.2}>
         {articles.map((article) => (
           <SwipeableListItem
-            key={article.id}
+            key={article.arxiv}
             leadingActions={leadingActions(article)}
             trailingActions={trailingActions(article)}
           >
@@ -137,7 +173,16 @@ export default function ArticleSwiper() {
         ))}
       </SwipeableList>
       {isFetching && <div className="loader"></div>}
-      {!hasMore && <div className="end">No more papers</div>}
+      {!hasMore && (
+        <>
+          <div className="end" style={{ color: "#aaa" }}>
+            No more papers
+          </div>
+          <Button onClick={importNewArticles} className="end">
+            Import more papers
+          </Button>
+        </>
+      )}
     </>
   );
 }

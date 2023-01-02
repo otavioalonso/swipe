@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const thresholdHeight = 50;
+const thresholdHeight = 500;
 
 const useInfiniteScroll = (callback) => {
   const [isFetching, setIsFetching] = useState(false);
