@@ -58,14 +58,6 @@ function App() {
               </AccountPage>
             }
           />
-          <Route
-            path="/rss"
-            element={
-              <AccountPage>
-                <Rss />
-              </AccountPage>
-            }
-          />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
