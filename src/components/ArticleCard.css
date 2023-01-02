@@ -7,6 +7,13 @@
     margin: 20px auto;
 }
 
+.card-header {
+    background-color: white;
+    border: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
 h6.card-text {
     font-weight: bold;
 }

@@ -7,6 +7,7 @@ export default function ArticleCard({
   abstract,
   authors,
   arxiv,
+  published,
 }) {
   return (
     <div className="card bg-white border-white border-0">
@@ -15,8 +16,11 @@ export default function ArticleCard({
         <img className="img-fluid" src={avatar} alt="Avatar" />
       </div>
       <div className="card-body">
-        <h4 className="card-title">{title}</h4>
-        <h6 className="card-text">{authors}</h6>
+        <div className="card-header">
+          <h4 className="card-title">{title}</h4>
+          <h6 className="card-text">{authors}</h6>
+          <p className="card-text">{published}</p>
+        </div>
         <p className="card-text">{abstract}</p>
       </div>
       <div className="card-footer">
@@ -32,7 +36,7 @@ export default function ArticleCard({
           className="btn btn-outline-primary mx-2"
           target="_blank"
         >
-          Open on arXiv
+          arXiv:{arxiv}
         </a>
       </div>
     </div>

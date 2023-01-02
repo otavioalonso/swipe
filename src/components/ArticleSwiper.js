@@ -31,6 +31,7 @@ import { Button } from "react-bootstrap";
 import "./ArticleSwiper.css";
 
 import ArticleCard from "./ArticleCard";
+import dateFormat from "dateformat";
 
 const cardsPerScroll = 10;
 const arxivQuery =
@@ -48,14 +49,12 @@ export default function ArticleSwiper() {
   }, []);
 
   function fetchMoreArticles() {
-    getDocs(
-      query(
-        collection(db, "users", currentUser.uid, "inbox"),
-        limit(cardsPerScroll),
-        orderBy("arxiv"),
-        startAfter(articles.length ? articles.at(-1).arxiv : null)
-      )
-    ).then((res) => {
+    let query_array = [collection(db, "users", currentUser.uid, "inbox")];
+    query_array.push(limit(cardsPerScroll));
+    query_array.push(orderBy("arxiv", "desc"));
+    if (articles.length) query_array.push(startAfter(articles.at(-1).arxiv));
+
+    getDocs(query(...query_array)).then((res) => {
       if (res.empty) {
         setHasMore(false);
       } else {
@@ -100,6 +99,7 @@ export default function ArticleSwiper() {
           authors: [...entry.querySelectorAll("author")]
             .map((author) => author.querySelector("name").innerHTML.trim())
             .join(", "),
+          published: new Date(entry.querySelector("published").innerHTML),
           avatar:
             "https://static.vecteezy.com/system/resources/previews/004/980/452/non_2x/astrophysics-blue-violet-flat-design-long-shadow-glyph-icon-astronomy-branch-study-of-universe-stars-planets-galaxies-astrophysical-discoveries-cosmology-silhouette-illustration-vector.jpg",
         }));
@@ -169,6 +169,10 @@ export default function ArticleSwiper() {
               avatar={article.avatar}
               authors={article.authors}
               arxiv={article.arxiv}
+              published={dateFormat(
+                article.published.toDate(),
+                "DDDD, mmmm d, yyyy"
+              )}
             />
           </SwipeableListItem>
         ))}
