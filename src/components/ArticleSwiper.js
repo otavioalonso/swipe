@@ -82,6 +82,7 @@ export default function ArticleSwiper(props) {
     props.logger("Checking new articles.");
     return new Promise(function (resolve) {
       const userDoc = doc(db, "users", currentUser.uid);
+      console.log(currentUser.uid);
 
       getDoc(userDoc).then((userRes) => {
         let user;
@@ -90,7 +91,8 @@ export default function ArticleSwiper(props) {
           user = userRes.data();
         } else {
           // If user doesn't exist, it will be created later
-          user = { lastAdded: new Date(0) };
+          user = { lastAdded: "0000.00000" };
+          console.log("User not in database.");
         }
 
         let query_array = [];
