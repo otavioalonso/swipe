@@ -104,12 +104,16 @@ export default function Dashboard() {
   function uploadArticles(articles) {
     return new Promise((resolve) => {
       printLog(`Uploading ${articles.length} papers to database.`);
-      let batch = writeBatch(db);
-      articles.map((article) => {
-        batch.set(doc(articleRef, article.arxiv.replace(".", "-")), article);
-      });
-      batch.commit();
-      printLog(`Done.`);
+      try {
+        let batch = writeBatch(db);
+        articles.map((article) => {
+          batch.set(doc(articleRef, article.arxiv.replace(".", "-")), article);
+        });
+        batch.commit();
+        printLog(`Done.`);
+      } catch (err) {
+        printLog(`Error: ${err}`);
+      }
       resolve();
     });
   }
