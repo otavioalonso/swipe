@@ -31,6 +31,7 @@ import { db } from "../firebase.js";
 
 export default function Dashboard() {
   const [error, setError] = useState("");
+  const [debugLog, setDebugLog] = useState([]);
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -47,11 +48,17 @@ export default function Dashboard() {
 
   const articleRef = collection(db, "articles");
 
+  function printLog(text) {
+    console.log(text);
+    setDebugLog((prev) => [...prev, text]);
+    setTimeout(() => setDebugLog((prev) => prev.slice(1)), 5000);
+  }
+
   function fetchArticles(start, max_results) {
     return new Promise((resolve) => {
-      console.log("Fetching papers from arXiv.");
+      printLog("Fetching papers from arXiv.");
       const arxivQuery = `https://export.arxiv.org/api/query?search_query=cat:astro-ph.CO&sortBy=submittedDate&start=${start}&max_results=${max_results}`;
-      console.log(arxivQuery);
+      printLog(arxivQuery);
 
       fetch(arxivQuery).then((response) => {
         response.text().then((content) => {
@@ -82,7 +89,12 @@ export default function Dashboard() {
               ? entry.querySelector("comment").innerHTML
               : "",
           }));
-          console.log(`Fetched ${articles.length} articles.`);
+          printLog(
+            `Obtained ${articles.length} articles (${
+              articles.slice(-1)[0].arxiv
+            } to ${articles[0].arxiv}).`
+          );
+
           resolve(articles);
         });
       });
@@ -91,13 +103,13 @@ export default function Dashboard() {
 
   function uploadArticles(articles) {
     return new Promise((resolve) => {
-      console.log(`Uploading ${articles.length} papers to database.`);
+      printLog(`Uploading ${articles.length} papers to database.`);
       let batch = writeBatch(db);
       articles.map((article) => {
         batch.set(doc(articleRef, article.arxiv.replace(".", "-")), article);
       });
       batch.commit();
-      console.log(`Done.`);
+      printLog(`Done.`);
       resolve();
     });
   }
@@ -110,15 +122,16 @@ export default function Dashboard() {
     query_array.push(limit(1));
 
     getDocs(query(...query_array)).then((res) => {
+      const latestPaper = res.docs[0].data();
+      printLog(`Most recent article in the database is ${latestPaper.arxiv}.`);
       // filter papers more recent than latest in the articles collection and add them
       fetchArticles(0, 100).then((articles) => {
-        uploadArticles(
-          res.empty
-            ? articles
-            : articles.filter(
-                (article) => article.arxiv > res.docs[0].data().arxiv
-              )
-        );
+        const articlesToAdd = res.empty
+          ? articles
+          : articles.filter((article) => article.arxiv > latestPaper.arxiv);
+
+        printLog(`${articlesToAdd.length} articles are new.`);
+        uploadArticles();
       });
     });
   }
@@ -148,8 +161,17 @@ export default function Dashboard() {
             Log Out
           </button>
         </div>
+        <div className="flex-row">
+          <h6 className="navbar-text container" style={{ textAlign: "center" }}>
+            {debugLog.map((t, i) => (
+              <p key={i} style={{ marginBottom: 0 }}>
+                {t}
+              </p>
+            ))}
+          </h6>
+        </div>
       </nav>
-      <ArticleSwiper />
+      <ArticleSwiper logger={printLog} />
     </>
   );
 }

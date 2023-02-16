@@ -48,7 +48,7 @@ function sliceIntoChunks(arr, chunkSize) {
   return res;
 }
 
-export default function ArticleSwiper() {
+export default function ArticleSwiper(props) {
   const [articles, setArticles] = useState([]);
   const [isFetching, setIsFetching, hasMore, setHasMore] =
     useInfiniteScroll(fetchMoreArticles);
@@ -79,33 +79,37 @@ export default function ArticleSwiper() {
   }
 
   function importNewArticles() {
+    props.logger("Checking new articles.");
     return new Promise(function (resolve) {
       const userDoc = doc(db, "users", currentUser.uid);
 
       getDoc(userDoc).then((userRes) => {
         let user;
 
-        if (userRes.exists()) {
+        if (userRes.exists() && "lastAdded" in userRes.data()) {
           user = userRes.data();
         } else {
           // If user doesn't exist, it will be created later
-          user = { lastUpdate: new Date(0) };
+          user = { lastAdded: new Date(0) };
         }
 
         let query_array = [];
         query_array.push(collection(db, "articles"));
-        query_array.push(orderBy("added", "desc"));
         query_array.push(orderBy("arxiv", "desc"));
-        query_array.push(where("added", ">", user.lastUpdate));
+        query_array.push(where("arxiv", ">", user.lastAdded));
         query_array.push(limit(500));
 
         // TODO: split in chunks of size 500
         getDocs(query(...query_array)).then((res) => {
           if (res.empty) {
+            props.logger("No new articles found.");
             resolve([]);
           } else {
             const batch = writeBatch(db);
             const articles = res.docs.map((e) => e.data());
+            props.logger(
+              `Found ${articles.length} new articles! Adding them to my inbox.`
+            );
 
             articles.map((article) => {
               batch.set(
@@ -120,13 +124,14 @@ export default function ArticleSwiper() {
               );
             });
             batch.commit();
+            user.lastAdded = articles[0].arxiv;
+            setDoc(userDoc, user);
+            props.logger("Done.");
             resolve(articles);
           }
         });
 
         // Updating lastUpdate tag to now
-        user.lastUpdate = Date.now();
-        setDoc(userDoc, user);
       });
     });
   }
@@ -153,10 +158,12 @@ export default function ArticleSwiper() {
   function archiveArticle(article) {
     addArticle(article, "archive");
     deleteArticle(article, "inbox");
+    props.logger(`Archived ${article.arxiv}.`);
   }
 
   function discardArticle(article) {
     deleteArticle(article, "inbox");
+    props.logger(`Discarded ${article.arxiv}.`);
   }
 
   function leadingActions(article) {
@@ -220,7 +227,7 @@ export default function ArticleSwiper() {
       {!hasMore && (
         <>
           <div className="end" style={{ color: "#aaa" }}>
-            No more papers
+            No more articles
           </div>
         </>
       )}
