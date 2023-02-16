@@ -91,7 +91,7 @@ export default function Dashboard() {
 
   function uploadArticles(articles) {
     return new Promise((resolve) => {
-      console.log(`Uploading papers to database.`);
+      console.log(`Uploading ${articles.length} papers to database.`);
       let batch = writeBatch(db);
       articles.map((article) => {
         batch.set(doc(articleRef, article.arxiv.replace(".", "-")), article);
@@ -103,7 +103,24 @@ export default function Dashboard() {
   }
 
   function handleImport() {
-    fetchArticles(0, 100).then(uploadArticles);
+    // setup query to get the latest paper in the articles collection
+    let query_array = [];
+    query_array.push(collection(db, "articles"));
+    query_array.push(orderBy("arxiv", "desc"));
+    query_array.push(limit(1));
+
+    getDocs(query(...query_array)).then((res) => {
+      // filter papers more recent than latest in the articles collection and add them
+      fetchArticles(0, 100).then((articles) => {
+        uploadArticles(
+          res.empty
+            ? articles
+            : articles.filter(
+                (article) => article.arxiv > res.docs[0].data().arxiv
+              )
+        );
+      });
+    });
   }
 
   return (
