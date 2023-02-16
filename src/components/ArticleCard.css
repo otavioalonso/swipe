@@ -30,7 +30,7 @@ p.card-text {
     background-size: cover;
     background-position: center;
     border-color: inherit;
-    background-image: url(http://res.cloudinary.com/d3/image/upload/c_scale,q_auto:good,w_1110/trianglify-v1-cs85g_cc5d2i.jpg);
+    background-image: url(https://res.cloudinary.com/d3/image/upload/c_scale,q_auto:good,w_1110/trianglify-v1-cs85g_cc5d2i.jpg);
 }
 
 /* First border-left-width setting is a fallback */
