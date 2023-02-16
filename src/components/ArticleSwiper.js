@@ -130,8 +130,6 @@ export default function ArticleSwiper(props) {
             resolve(articles);
           }
         });
-
-        // Updating lastUpdate tag to now
       });
     });
   }

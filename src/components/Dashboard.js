@@ -131,7 +131,7 @@ export default function Dashboard() {
           : articles.filter((article) => article.arxiv > latestPaper.arxiv);
 
         printLog(`${articlesToAdd.length} articles are new.`);
-        uploadArticles();
+        uploadArticles(articlesToAdd);
       });
     });
   }
