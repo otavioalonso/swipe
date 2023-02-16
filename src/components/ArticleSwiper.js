@@ -82,7 +82,6 @@ export default function ArticleSwiper(props) {
     props.logger("Checking new articles.");
     return new Promise(function (resolve) {
       const userDoc = doc(db, "users", currentUser.uid);
-      console.log(currentUser.uid);
 
       getDoc(userDoc).then((userRes) => {
         let user;
