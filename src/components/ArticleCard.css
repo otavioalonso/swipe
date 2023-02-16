@@ -20,7 +20,7 @@ h6.card-text {
 
 p.card-text {
     max-height: 1500px;
-    overflow-y: auto;
+    overflow-y: visible;
 }
 
 .card-img {

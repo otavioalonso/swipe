@@ -9,8 +9,10 @@ import {
   orderBy,
   startAfter,
   limit,
+  writeBatch,
   setDoc,
   deleteDoc,
+  where,
 } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
 import { db } from "../firebase.js";
@@ -37,6 +39,15 @@ const cardsPerScroll = 10;
 const arxivQuery =
   "https://export.arxiv.org/api/query?search_query=cat:astro-ph.CO&sortBy=submittedDate&max_results=100";
 
+function sliceIntoChunks(arr, chunkSize) {
+  const res = [];
+  for (let i = 0; i < arr.length; i += chunkSize) {
+    const chunk = arr.slice(i, i + chunkSize);
+    res.push(chunk);
+  }
+  return res;
+}
+
 export default function ArticleSwiper() {
   const [articles, setArticles] = useState([]);
   const [isFetching, setIsFetching, hasMore, setHasMore] =
@@ -45,7 +56,7 @@ export default function ArticleSwiper() {
   const { currentUser } = useAuth();
 
   useEffect(() => {
-    fetchMoreArticles();
+    importNewArticles().then(fetchMoreArticles);
   }, []);
 
   function fetchMoreArticles() {
@@ -54,16 +65,69 @@ export default function ArticleSwiper() {
     query_array.push(orderBy("arxiv", "desc"));
     if (articles.length) query_array.push(startAfter(articles.at(-1).arxiv));
 
-    getDocs(query(...query_array)).then((res) => {
-      if (res.empty) {
+    getDocs(query(...query_array)).then((response) => {
+      if (response.empty) {
         setHasMore(false);
       } else {
         setArticles((prev) => [
           ...(articles.length ? prev : []),
-          ...res.docs.map((d) => d.data()),
+          ...response.docs.map((d) => d.data()),
         ]);
       }
       setIsFetching(false);
+    });
+  }
+
+  function importNewArticles() {
+    return new Promise(function (resolve) {
+      const userDoc = doc(db, "users", currentUser.uid);
+
+      getDoc(userDoc).then((userRes) => {
+        let user;
+
+        if (userRes.exists()) {
+          user = userRes.data();
+        } else {
+          // If user doesn't exist, it will be created later
+          user = { lastUpdate: new Date(0) };
+        }
+
+        let query_array = [];
+        query_array.push(collection(db, "articles"));
+        query_array.push(orderBy("added", "desc"));
+        query_array.push(orderBy("arxiv", "desc"));
+        query_array.push(where("added", ">", user.lastUpdate));
+        query_array.push(limit(500));
+
+        // TODO: split in chunks of size 500
+        getDocs(query(...query_array)).then((res) => {
+          if (res.empty) {
+            resolve([]);
+          } else {
+            const batch = writeBatch(db);
+            const articles = res.docs.map((e) => e.data());
+
+            articles.map((article) => {
+              batch.set(
+                doc(
+                  db,
+                  "users",
+                  currentUser.uid,
+                  "inbox",
+                  article.arxiv.replace(".", "-")
+                ),
+                article
+              );
+            });
+            batch.commit();
+            resolve(articles);
+          }
+        });
+
+        // Updating lastUpdate tag to now
+        user.lastUpdate = Date.now();
+        setDoc(userDoc, user);
+      });
     });
   }
 
@@ -84,33 +148,6 @@ export default function ArticleSwiper() {
     deleteDoc(
       doc(db, "users", currentUser.uid, folder, article.arxiv.replace(".", "-"))
     );
-  }
-
-  function importNewArticles() {
-    setHasMore(true);
-    setArticles([]);
-    return fetch(arxivQuery).then((res) => {
-      res.text().then((content) => {
-        const xml = new window.DOMParser().parseFromString(content, "text/xml");
-        const articles = [...xml.querySelectorAll("entry")].map((entry) => ({
-          arxiv: entry.querySelector("id").innerHTML.match(/\d{4}\.\d{3,6}/)[0],
-          title: entry.querySelector("title").innerHTML.trim(),
-          abstract: entry.querySelector("summary").innerHTML.trim(),
-          authors: [...entry.querySelectorAll("author")]
-            .map((author) => author.querySelector("name").innerHTML.trim())
-            .join(", "),
-          published: new Date(entry.querySelector("published").innerHTML),
-          avatar:
-            "https://static.vecteezy.com/system/resources/previews/004/980/452/non_2x/astrophysics-blue-violet-flat-design-long-shadow-glyph-icon-astronomy-branch-study-of-universe-stars-planets-galaxies-astrophysical-discoveries-cosmology-silhouette-illustration-vector.jpg",
-        }));
-        console.log("Importing articles", articles);
-        articles.map((article) => {
-          addArticle(article, "inbox");
-        });
-        fetchMoreArticles();
-        return articles;
-      });
-    });
   }
 
   function archiveArticle(article) {
@@ -166,8 +203,10 @@ export default function ArticleSwiper() {
             <ArticleCard
               title={article.title}
               abstract={article.abstract}
-              avatar={article.avatar}
-              authors={article.authors}
+              avatar={
+                "https://static.vecteezy.com/system/resources/previews/004/980/452/non_2x/astrophysics-blue-violet-flat-design-long-shadow-glyph-icon-astronomy-branch-study-of-universe-stars-planets-galaxies-astrophysical-discoveries-cosmology-silhouette-illustration-vector.jpg"
+              }
+              authors={article.authors.join(", ")}
               arxiv={article.arxiv}
               published={dateFormat(
                 article.published.toDate(),
@@ -183,9 +222,6 @@ export default function ArticleSwiper() {
           <div className="end" style={{ color: "#aaa" }}>
             No more papers
           </div>
-          <Button onClick={importNewArticles} className="end">
-            Import more papers
-          </Button>
         </>
       )}
     </>
