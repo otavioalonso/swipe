@@ -157,12 +157,12 @@ export default function ArticleSwiper(props) {
   function archiveArticle(article) {
     addArticle(article, "archive");
     deleteArticle(article, "inbox");
-    props.logger(`Archived ${article.arxiv}.`);
+    // props.logger(`Archived ${article.arxiv}.`);
   }
 
   function discardArticle(article) {
     deleteArticle(article, "inbox");
-    props.logger(`Discarded ${article.arxiv}.`);
+    // props.logger(`Discarded ${article.arxiv}.`);
   }
 
   function leadingActions(article) {
