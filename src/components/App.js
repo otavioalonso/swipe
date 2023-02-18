@@ -8,6 +8,7 @@ import ForgotPassword from "./ForgotPassword";
 import UpdateProfile from "./UpdateProfile";
 import AccountPage from "./AccountPage";
 import Dashboard from "./Dashboard";
+import ArticleViewer from "./ArticleViewer";
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
               </AccountPage>
             }
           />
+          <Route exact path="/pdf/:arxiv" element={<ArticleViewer />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

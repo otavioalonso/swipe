@@ -161,6 +161,7 @@ export default function ArticleSwiper(props) {
   }
 
   function discardArticle(article) {
+    addArticle(article, "trash");
     deleteArticle(article, "inbox");
     // props.logger(`Discarded ${article.arxiv}.`);
   }
