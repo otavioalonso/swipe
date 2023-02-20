@@ -1,0 +1,19 @@
+button.nav-link.trash  {
+    color: #dc3545;
+    background-color: white;
+}
+
+button.nav-link.trash.active {
+    color: white;
+    background-color: #dc3545;
+}
+
+button.nav-link.archive  {
+    color: #4ba72a;
+    background-color: white;
+}
+
+button.nav-link.archive.active {
+    color: white;
+    background-color: #4ba72a;
+}

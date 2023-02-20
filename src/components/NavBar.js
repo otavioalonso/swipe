@@ -3,6 +3,7 @@ import React from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useLog } from "../contexts/LogContext";
 import { useNavigate } from "react-router-dom";
+import "./NavBar.css";
 
 export default function NavBar(props) {
   const { currentUser, logout } = useAuth();
@@ -45,29 +46,31 @@ export default function NavBar(props) {
         </button>
       </div>
       <ul className="nav nav-pills nav-fill mt-3 mb-0">
-        <li className="nav-item">
-          <a
-            className={`nav-link ${props.folder == "trash" && "active"}`}
-            href="/trash"
+        <li className="nav-item mx-1">
+          <button
+            className={`nav-link trash ${props.folder == "trash" && "active"}`}
+            onClick={() => props.setFolder("trash")}
           >
             Trash
-          </a>
+          </button>
         </li>
-        <li className="nav-item">
-          <a
+        <li className="nav-item mx-1">
+          <button
             className={`nav-link ${props.folder == "inbox" && "active"}`}
-            href="/inbox"
+            onClick={() => props.setFolder("inbox")}
           >
             Inbox
-          </a>
+          </button>
         </li>
-        <li className="nav-item">
-          <a
-            className={`nav-link ${props.folder == "archive" && "active"}`}
-            href="/archive"
+        <li className="nav-item mx-1">
+          <button
+            className={`nav-link archive ${
+              props.folder == "archive" && "active"
+            }`}
+            onClick={() => props.setFolder("archive")}
           >
             Archive
-          </a>
+          </button>
         </li>
       </ul>
       <div className="flex-row">

@@ -19,23 +19,27 @@ import ArticleCard from "./ArticleCard";
 import dateFormat from "dateformat";
 
 export default function ArticleSwiper(props) {
-  const cardsPerScroll = 10;
-
   const [articles, setArticles] = useState([]);
   const [isFetching, setIsFetching, hasMore, setHasMore] =
     useInfiniteScroll(fetchMoreArticles);
 
-  useEffect(() => {
-    if ("onLoad" in props && props.onLoad)
-      props.onLoad().then(fetchMoreArticles);
-    else fetchMoreArticles();
-  }, []);
+  useEffect(
+    () => {
+      if ("onLoad" in props && props.onLoad)
+        props.onLoad().then(() => fetchMoreArticles(true));
+      else fetchMoreArticles(true);
+    },
+    "folder" in props ? [props.folder] : []
+  );
 
-  function fetchMoreArticles() {
-    props.articleLoader(articles, setArticles).then((newPapers) => {
-      if (!newPapers || !newPapers.length) setHasMore(false);
-      setIsFetching(false);
-    });
+  function fetchMoreArticles(forceStart = false) {
+    if (forceStart) setArticles([]);
+    props
+      .articleLoader(forceStart ? [] : articles, setArticles)
+      .then((newPapers) => {
+        if (!newPapers || !newPapers.length) setHasMore(false);
+        setIsFetching(false);
+      });
   }
 
   function leadingActions(article) {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import {
   doc,
@@ -27,6 +27,8 @@ const cardsPerScroll = 10;
 export default function Dashboard({ folder }) {
   const { currentUser } = useAuth();
   const { log } = useLog();
+
+  const [currentFolder, setCurrentFolder] = useState(folder);
 
   const articleRef = collection(db, "articles");
 
@@ -206,44 +208,51 @@ export default function Dashboard({ folder }) {
     deleteArticle(article, from);
   }
 
-  function getArticleLoader(folder) {
-    return (articles, setArticles) =>
-      new Promise((resolve) => {
-        let query_array = [collection(db, "users", currentUser.uid, folder)];
-        query_array.push(limit(cardsPerScroll));
-        query_array.push(orderBy("arxiv", "desc"));
-        if (articles.length)
-          query_array.push(startAfter(articles.at(-1).arxiv));
+  function getArticleLoader(articles, setArticles) {
+    return new Promise((resolve) => {
+      let query_array = [
+        collection(db, "users", currentUser.uid, currentFolder),
+      ];
+      query_array.push(limit(cardsPerScroll));
+      query_array.push(orderBy("arxiv", "desc"));
+      if (articles.length) {
+        query_array.push(startAfter(articles.at(-1).arxiv));
+      }
 
-        getDocs(query(...query_array)).then((response) => {
-          let newPapers;
-          if (response.empty) {
-            newPapers = [];
-          } else {
-            newPapers = response.docs.map((d) => d.data());
-            setArticles((prev) => [
-              ...(articles.length ? prev : []),
-              ...newPapers,
-            ]);
-          }
-          resolve(newPapers);
-        });
+      getDocs(query(...query_array)).then((response) => {
+        let newPapers;
+        if (response.empty) {
+          newPapers = [];
+        } else {
+          newPapers = response.docs.map((d) => d.data());
+          setArticles((prev) => [
+            ...(articles.length ? prev : []),
+            ...newPapers,
+          ]);
+        }
+        resolve(newPapers);
       });
+    });
   }
 
   return (
     <>
-      <NavBar importArxiv={folder == "inbox" && importArxiv} folder={folder} />
+      <NavBar
+        importArxiv={currentFolder == "inbox" && importArxiv}
+        folder={currentFolder}
+        setFolder={setCurrentFolder}
+      />
       <ArticleSwiper
-        articleLoader={getArticleLoader(folder)}
-        onLoad={folder == "inbox" && addNewArticles}
+        articleLoader={getArticleLoader}
+        folder={currentFolder}
+        onLoad={currentFolder == "inbox" && addNewArticles}
         onSwipeLeft={
-          ["inbox", "archive"].includes(folder) &&
-          ((article) => moveArticle(article, folder, "trash"))
+          ["inbox", "archive"].includes(currentFolder) &&
+          ((article) => moveArticle(article, currentFolder, "trash"))
         }
         onSwipeRight={
-          ["inbox", "trash"].includes(folder) &&
-          ((article) => moveArticle(article, folder, "archive"))
+          ["inbox", "trash"].includes(currentFolder) &&
+          ((article) => moveArticle(article, currentFolder, "archive"))
         }
       />
     </>
