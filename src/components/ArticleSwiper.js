@@ -1,23 +1,6 @@
 import React, { useState, useEffect } from "react";
 
 import {
-  doc,
-  getDocs,
-  getDoc,
-  collection,
-  query,
-  orderBy,
-  startAfter,
-  limit,
-  writeBatch,
-  setDoc,
-  deleteDoc,
-  where,
-} from "firebase/firestore";
-import { useAuth } from "../contexts/AuthContext";
-import { db } from "../firebase.js";
-
-import {
   LeadingActions,
   SwipeableList,
   SwipeableListItem,
@@ -29,141 +12,30 @@ import useInfiniteScroll from "./InfiniteScroll";
 
 import "react-swipeable-list/dist/styles.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Button } from "react-bootstrap";
+
 import "./ArticleSwiper.css";
 
 import ArticleCard from "./ArticleCard";
 import dateFormat from "dateformat";
 
-const cardsPerScroll = 10;
-const arxivQuery =
-  "https://export.arxiv.org/api/query?search_query=cat:astro-ph.CO&sortBy=submittedDate&max_results=100";
-
-function sliceIntoChunks(arr, chunkSize) {
-  const res = [];
-  for (let i = 0; i < arr.length; i += chunkSize) {
-    const chunk = arr.slice(i, i + chunkSize);
-    res.push(chunk);
-  }
-  return res;
-}
-
 export default function ArticleSwiper(props) {
+  const cardsPerScroll = 10;
+
   const [articles, setArticles] = useState([]);
   const [isFetching, setIsFetching, hasMore, setHasMore] =
     useInfiniteScroll(fetchMoreArticles);
 
-  const { currentUser } = useAuth();
-
   useEffect(() => {
-    importNewArticles().then(fetchMoreArticles);
+    if ("onLoad" in props && props.onLoad)
+      props.onLoad().then(fetchMoreArticles);
+    else fetchMoreArticles();
   }, []);
 
   function fetchMoreArticles() {
-    let query_array = [collection(db, "users", currentUser.uid, "inbox")];
-    query_array.push(limit(cardsPerScroll));
-    query_array.push(orderBy("arxiv", "desc"));
-    if (articles.length) query_array.push(startAfter(articles.at(-1).arxiv));
-
-    getDocs(query(...query_array)).then((response) => {
-      if (response.empty) {
-        setHasMore(false);
-      } else {
-        setArticles((prev) => [
-          ...(articles.length ? prev : []),
-          ...response.docs.map((d) => d.data()),
-        ]);
-      }
+    props.articleLoader(articles, setArticles).then((newPapers) => {
+      if (!newPapers || !newPapers.length) setHasMore(false);
       setIsFetching(false);
     });
-  }
-
-  function importNewArticles() {
-    props.logger("Checking new articles.");
-    return new Promise(function (resolve) {
-      const userDoc = doc(db, "users", currentUser.uid);
-
-      getDoc(userDoc).then((userRes) => {
-        let user;
-
-        if (userRes.exists() && "lastAdded" in userRes.data()) {
-          user = userRes.data();
-        } else {
-          // If user doesn't exist, it will be created later
-          user = { lastAdded: "0000.00000" };
-          console.log("User not in database.");
-        }
-
-        let query_array = [];
-        query_array.push(collection(db, "articles"));
-        query_array.push(orderBy("arxiv", "desc"));
-        query_array.push(where("arxiv", ">", user.lastAdded));
-        query_array.push(limit(500));
-
-        // TODO: split in chunks of size 500
-        getDocs(query(...query_array)).then((res) => {
-          if (res.empty) {
-            props.logger("No new articles found.");
-            resolve([]);
-          } else {
-            const batch = writeBatch(db);
-            const articles = res.docs.map((e) => e.data());
-            props.logger(
-              `Found ${articles.length} new articles! Adding them to my inbox.`
-            );
-
-            articles.map((article) => {
-              batch.set(
-                doc(
-                  db,
-                  "users",
-                  currentUser.uid,
-                  "inbox",
-                  article.arxiv.replace(".", "-")
-                ),
-                article
-              );
-            });
-            batch.commit();
-            user.lastAdded = articles[0].arxiv;
-            setDoc(userDoc, user);
-            props.logger("Done.");
-            resolve(articles);
-          }
-        });
-      });
-    });
-  }
-
-  function addArticle(article, folder) {
-    setDoc(
-      doc(
-        db,
-        "users",
-        currentUser.uid,
-        folder,
-        article.arxiv.replace(".", "-")
-      ),
-      article
-    );
-  }
-
-  function deleteArticle(article, folder) {
-    deleteDoc(
-      doc(db, "users", currentUser.uid, folder, article.arxiv.replace(".", "-"))
-    );
-  }
-
-  function archiveArticle(article) {
-    addArticle(article, "archive");
-    deleteArticle(article, "inbox");
-    // props.logger(`Archived ${article.arxiv}.`);
-  }
-
-  function discardArticle(article) {
-    addArticle(article, "trash");
-    deleteArticle(article, "inbox");
-    // props.logger(`Discarded ${article.arxiv}.`);
   }
 
   function leadingActions(article) {
@@ -173,7 +45,8 @@ export default function ArticleSwiper(props) {
           destructive={true}
           onClick={() => {
             window.dispatchEvent(new Event("scroll"));
-            return archiveArticle(article);
+            if ("onSwipeRight" in props && props.onSwipeRight)
+              return props.onSwipeRight(article);
           }}
         >
           <span></span>
@@ -189,7 +62,8 @@ export default function ArticleSwiper(props) {
           destructive={true}
           onClick={() => {
             window.dispatchEvent(new Event("scroll"));
-            return discardArticle(article);
+            if ("onSwipeLeft" in props && props.onSwipeLeft)
+              return props.onSwipeLeft(article);
           }}
         >
           <span></span>

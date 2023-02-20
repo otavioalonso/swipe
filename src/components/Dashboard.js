@@ -1,17 +1,4 @@
-import React, { useState } from "react";
-// import {
-//   Card,
-//   Button,
-//   Alert,
-//   Navbar,
-//   Nav,
-//   NavItem,
-//   Container,
-// } from "react-bootstrap";
-import { useAuth } from "../contexts/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
-
-import ArticleSwiper from "./ArticleSwiper";
+import React from "react";
 
 import {
   doc,
@@ -29,36 +16,34 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase.js";
 
-export default function Dashboard() {
-  const [error, setError] = useState("");
-  const [debugLog, setDebugLog] = useState([]);
-  const { currentUser, logout } = useAuth();
-  const navigate = useNavigate();
+import NavBar from "./NavBar";
+import ArticleSwiper from "./ArticleSwiper";
 
-  async function handleLogout() {
-    setError("");
+import { useAuth } from "../contexts/AuthContext";
+import { useLog } from "../contexts/LogContext";
 
-    try {
-      await logout();
-      navigate("/login");
-    } catch {
-      setError("Failed to log out");
-    }
-  }
+const cardsPerScroll = 10;
+
+export default function Dashboard({ folder }) {
+  const { currentUser } = useAuth();
+  const { log } = useLog();
 
   const articleRef = collection(db, "articles");
 
-  function printLog(text) {
-    console.log(text);
-    setDebugLog((prev) => [...prev, text]);
-    setTimeout(() => setDebugLog((prev) => prev.slice(1)), 5000);
+  function sliceIntoChunks(arr, chunkSize) {
+    const res = [];
+    for (let i = 0; i < arr.length; i += chunkSize) {
+      const chunk = arr.slice(i, i + chunkSize);
+      res.push(chunk);
+    }
+    return res;
   }
 
-  function fetchArticles(start, max_results) {
+  function fetchArxiv(start, max_results) {
     return new Promise((resolve) => {
-      printLog("Fetching papers from arXiv.");
+      log("Fetching papers from arXiv.");
       const arxivQuery = `https://export.arxiv.org/api/query?search_query=cat:astro-ph.CO&sortBy=submittedDate&start=${start}&max_results=${max_results}`;
-      printLog(arxivQuery);
+      log(arxivQuery);
 
       fetch(arxivQuery).then((response) => {
         response.text().then((content) => {
@@ -89,7 +74,7 @@ export default function Dashboard() {
               ? entry.querySelector("comment").innerHTML
               : "",
           }));
-          printLog(
+          log(
             `Obtained ${articles.length} articles (${
               articles.slice(-1)[0].arxiv
             } to ${articles[0].arxiv}).`
@@ -103,22 +88,22 @@ export default function Dashboard() {
 
   function uploadArticles(articles) {
     return new Promise((resolve) => {
-      printLog(`Uploading ${articles.length} papers to database.`);
+      log(`Uploading ${articles.length} papers to database.`);
       try {
         let batch = writeBatch(db);
         articles.map((article) => {
           batch.set(doc(articleRef, article.arxiv.replace(".", "-")), article);
         });
         batch.commit();
-        printLog(`Done.`);
+        log(`Done.`);
       } catch (err) {
-        printLog(`Error: ${err}`);
+        log(`Error: ${err}`);
       }
       resolve();
     });
   }
 
-  function handleImport() {
+  function importArxiv() {
     // setup query to get the latest paper in the articles collection
     let query_array = [];
     query_array.push(collection(db, "articles"));
@@ -127,55 +112,140 @@ export default function Dashboard() {
 
     getDocs(query(...query_array)).then((res) => {
       const latestPaper = res.docs[0].data();
-      printLog(`Most recent article in the database is ${latestPaper.arxiv}.`);
+      log(`Most recent article in the database is ${latestPaper.arxiv}.`);
       // filter papers more recent than latest in the articles collection and add them
-      fetchArticles(0, 100).then((articles) => {
+      fetchArxiv(0, 100).then((articles) => {
         const articlesToAdd = res.empty
           ? articles
           : articles.filter((article) => article.arxiv > latestPaper.arxiv);
 
-        printLog(`${articlesToAdd.length} articles are new.`);
+        log(`${articlesToAdd.length} articles are new.`);
         uploadArticles(articlesToAdd);
       });
     });
   }
 
+  function addNewArticles() {
+    log("Checking new articles.");
+    return new Promise((resolve) => {
+      const userDoc = doc(db, "users", currentUser.uid);
+
+      getDoc(userDoc).then((userRes) => {
+        let user;
+
+        if (userRes.exists() && "lastAdded" in userRes.data()) {
+          user = userRes.data();
+        } else {
+          // If user doesn't exist, it will be created later
+          user = { lastAdded: "0000.00000" };
+          log("User not in database.");
+        }
+
+        let query_array = [];
+        query_array.push(collection(db, "articles"));
+        query_array.push(orderBy("arxiv", "desc"));
+        query_array.push(where("arxiv", ">", user.lastAdded));
+        query_array.push(limit(500));
+
+        // TODO: split in chunks of size 500
+        getDocs(query(...query_array)).then((res) => {
+          if (res.empty) {
+            log("No new articles found.");
+            resolve([]);
+          } else {
+            const batch = writeBatch(db);
+            const articles = res.docs.map((e) => e.data());
+            log(
+              `Found ${articles.length} new articles! Adding them to my inbox.`
+            );
+
+            articles.map((article) => {
+              batch.set(
+                doc(
+                  db,
+                  "users",
+                  currentUser.uid,
+                  "inbox",
+                  article.arxiv.replace(".", "-")
+                ),
+                article
+              );
+            });
+            batch.commit();
+            user.lastAdded = articles[0].arxiv;
+            setDoc(userDoc, user);
+            log("Done.");
+            resolve(articles);
+          }
+        });
+      });
+    });
+  }
+
+  function addArticle(article, folder) {
+    setDoc(
+      doc(
+        db,
+        "users",
+        currentUser.uid,
+        folder,
+        article.arxiv.replace(".", "-")
+      ),
+      article
+    );
+  }
+
+  function deleteArticle(article, folder) {
+    deleteDoc(
+      doc(db, "users", currentUser.uid, folder, article.arxiv.replace(".", "-"))
+    );
+  }
+
+  function moveArticle(article, from, to) {
+    addArticle(article, to);
+    deleteArticle(article, from);
+  }
+
+  function getArticleLoader(folder) {
+    return (articles, setArticles) =>
+      new Promise((resolve) => {
+        let query_array = [collection(db, "users", currentUser.uid, folder)];
+        query_array.push(limit(cardsPerScroll));
+        query_array.push(orderBy("arxiv", "desc"));
+        if (articles.length)
+          query_array.push(startAfter(articles.at(-1).arxiv));
+
+        getDocs(query(...query_array)).then((response) => {
+          let newPapers;
+          if (response.empty) {
+            newPapers = [];
+          } else {
+            newPapers = response.docs.map((d) => d.data());
+            setArticles((prev) => [
+              ...(articles.length ? prev : []),
+              ...newPapers,
+            ]);
+          }
+          resolve(newPapers);
+        });
+      });
+  }
+
   return (
     <>
-      <nav className="navbar navbar-expand-md flex-column">
-        <div className="flex-row">
-          <h6 className="navbar-text container" style={{ textAlign: "center" }}>
-            <strong>User:</strong> {currentUser.email}
-          </h6>
-        </div>
-        <div className="flex-column">
-          <button className="btn btn-primary mx-2 my-2" onClick={handleImport}>
-            Sync with arXiv
-          </button>
-          <a
-            href="/update-profile"
-            className="btn btn-outline-primary mx-2 my-2"
-          >
-            Update Profile
-          </a>
-          <button
-            className="btn btn-outline-danger mx-2 my-2"
-            onClick={handleLogout}
-          >
-            Log Out
-          </button>
-        </div>
-        <div className="flex-row">
-          <h6 className="navbar-text container" style={{ textAlign: "center" }}>
-            {debugLog.map((t, i) => (
-              <p key={i} style={{ marginBottom: 0 }}>
-                {t}
-              </p>
-            ))}
-          </h6>
-        </div>
-      </nav>
-      <ArticleSwiper logger={printLog} />
+      <NavBar importArxiv={folder == "inbox" && importArxiv} folder={folder} />
+      <ArticleSwiper
+        articleLoader={getArticleLoader(folder)}
+        onLoad={folder == "inbox" && addNewArticles}
+        onSwipeLeft={
+          ["inbox", "archive"].includes(folder) &&
+          ((article) => moveArticle(article, folder, "trash"))
+        }
+        onSwipeRight={
+          ["inbox", "trash"].includes(folder) &&
+          ((article) => moveArticle(article, folder, "archive"))
+        }
+      />
     </>
   );
 }
