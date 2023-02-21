@@ -8,12 +8,7 @@ button.nav-link.trash  {
     background-color: white;
 }
 
-button.nav-link.trash.active {
-    color: white;
-    background-color: #dc3545;
-}
-
-button.nav-link.trash:hover {
+button.nav-link.trash.active, button.nav-link.trash:hover {
     color: white;
     background-color: #dc3545;
 }
@@ -23,12 +18,7 @@ button.nav-link.archive  {
     background-color: white;
 }
 
-button.nav-link.archive.active {
-    color: white;
-    background-color: #4ba72a;
-}
-
-button.nav-link.archive:hover {
+button.nav-link.archive.active, button.nav-link.archive:hover {
     color: white;
     background-color: #4ba72a;
 }

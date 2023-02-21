@@ -48,7 +48,7 @@ export default function NavBar(props) {
       <ul className="nav nav-pills nav-fill mt-3 mb-0">
         <li className="nav-item mx-1">
           <button
-            className={`nav-link trash ${props.folder == "trash" && "active"}`}
+            className={`nav-link trash ${props.folder === "trash" && "active"}`}
             onClick={() => {
               props.setFolder("trash");
               window.history.replaceState(null, "Cosmopapers", "/trash");
@@ -59,7 +59,7 @@ export default function NavBar(props) {
         </li>
         <li className="nav-item mx-1">
           <button
-            className={`nav-link ${props.folder == "inbox" && "active"}`}
+            className={`nav-link ${props.folder === "inbox" && "active"}`}
             onClick={() => {
               props.setFolder("inbox");
               window.history.replaceState(null, "Cosmopapers", "/inbox");
@@ -71,7 +71,7 @@ export default function NavBar(props) {
         <li className="nav-item mx-1">
           <button
             className={`nav-link archive ${
-              props.folder == "archive" && "active"
+              props.folder === "archive" && "active"
             }`}
             onClick={() => {
               props.setFolder("archive");
