@@ -33,7 +33,6 @@ export default function ArticleSwiper(props) {
   );
 
   function fetchMoreArticles(forceStart = false) {
-    console.log(`Force start = ${forceStart}`);
     if (forceStart) setArticles([]);
     props
       .articleLoader(forceStart ? [] : articles, setArticles)
