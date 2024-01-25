@@ -18,10 +18,10 @@ exports.arxivupdate = onMessagePublished({
     timeoutSeconds: 60,
     region: "us-central1",
     onTimeout: () => {
-        functions.logger.info(`arXiv update timed out.`);
+        functions.logger.info(`arxivupdate: update timed out.`);
     },
     onFailure: () => {
-        functions.logger.info(`arXiv update failed.`);
+        functions.logger.info(`arxivupdate: update failed.`);
     },
 },
 (event) => {
@@ -30,15 +30,16 @@ exports.arxivupdate = onMessagePublished({
                   .limit(1)
                   .get().then((res) => {
         const latestPaper = res.docs[0].data();
-        functions.logger.info(`Most recent article in the database is ${latestPaper.arxiv}.`);
+        functions.logger.info(`arxivupdate: most recent article in the database is ${latestPaper.arxiv}.`);
         // filter papers more recent than latest in the articles collection and add them
         fetchArxiv(0, 100).then((articles) => {
-        const articlesToAdd = res.empty
-            ? articles
-            : articles.filter((article) => article.arxiv > latestPaper.arxiv);
+          functions.logger.info(`arxivupdate: comparing ${latestPaper.arxiv} to (${articles.slice(-1)[0].arxiv}, ${articles[0].arxiv})`)
+          const articlesToAdd = res.empty
+              ? articles
+              : articles.filter((article) => article.arxiv > latestPaper.arxiv);
 
-            functions.logger.info(`${articlesToAdd.length} articles are new.`);
-        uploadArticles(articlesToAdd);
+              functions.logger.info(`arxivupdate: ${articlesToAdd.length} articles are new.`);
+          uploadArticles(articlesToAdd);
         });
     });
     return null;
@@ -47,8 +48,8 @@ exports.arxivupdate = onMessagePublished({
 function fetchArxiv(start, max_results) {
   return new Promise((resolve) => {
     const arxivQuery = `https://export.arxiv.org/api/query?search_query=cat:astro-ph.CO&sortBy=submittedDate&start=${start}&max_results=${max_results}`;
-    functions.logger.info(`Fetching ${max_results} articles from arXiv.`);
-    functions.logger.info(arxivQuery);
+    functions.logger.info(`fetchArxiv: fetching ${max_results} articles from arXiv.`);
+    functions.logger.info(`fetchArxiv: ${arxivQuery}`);
     JSDOM.fromURL(arxivQuery).then((dom) => {
       const xml = dom.window.document;
       const articles = [...xml.querySelectorAll("entry")].map((entry) => ({
@@ -71,7 +72,7 @@ function fetchArxiv(start, max_results) {
           ? entry.querySelector("arxiv\\:comment").innerHTML
           : "",
       }));
-      functions.logger.info(`Got ${articles.length} articles.`);
+      functions.logger.info(`fetchArxiv: got ${articles.length} articles (${articles.slice(-1)[0].arxiv} to ${articles[0].arxiv}).`);
       resolve(articles);
     });
   });
@@ -79,13 +80,17 @@ function fetchArxiv(start, max_results) {
 
 function uploadArticles(articles) {
     return new Promise((resolve) => {
-        const batch = getFirestore().batch();
-        functions.logger.info(`Uploading articles to database.`);
+      functions.logger.info(`uploadArticles: uploading articles to database.`);
+      try {
+        let batch = getFirestore().batch();
         articles.map((article) => {
             batch.set(getFirestore().collection("articles").doc(article.arxiv.replace(".", "-")), article);
         });
         batch.commit();
-        functions.logger.info(`Articles uploaded successfully.`);
+        functions.logger.info(`uploadArticles: articles uploaded successfully.`);
+      } catch (err) {
+        functions.logger.error(`uploadArticles: error while uploading articles: ${err}`);
+      }
         resolve();
     });
 }
