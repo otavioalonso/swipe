@@ -32,15 +32,6 @@ export default function Dashboard({ folder }) {
 
   const articleRef = collection(db, "articles");
 
-  function sliceIntoChunks(arr, chunkSize) {
-    const res = [];
-    for (let i = 0; i < arr.length; i += chunkSize) {
-      const chunk = arr.slice(i, i + chunkSize);
-      res.push(chunk);
-    }
-    return res;
-  }
-
   function fetchArxiv(start, max_results) {
     return new Promise((resolve) => {
       log("Fetching papers from arXiv.");
@@ -238,7 +229,6 @@ export default function Dashboard({ folder }) {
   return (
     <>
       <NavBar
-        importArxiv={currentFolder == "inbox" && importArxiv}
         folder={currentFolder}
         setFolder={setCurrentFolder}
       />

@@ -27,14 +27,6 @@ export default function NavBar(props) {
         </h6>
       </div>
       <div className="flex-column">
-        {"importArxiv" in props && props.importArxiv && (
-          <button
-            className="btn btn-primary mx-2 my-2"
-            onClick={props.importArxiv}
-          >
-            Sync with arXiv
-          </button>
-        )}
         <a href="/update-profile" className="btn btn-outline-primary mx-2 my-2">
           Update Profile
         </a>
