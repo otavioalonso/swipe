@@ -6,6 +6,8 @@ const { JSDOM } = require("jsdom");
 const { initializeApp } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
 
+const NUM_ARTICLES_ARXIV_FETCH = 100;
+
 initializeApp();
 
 exports.arxivupdate = onMessagePublished({
@@ -32,13 +34,18 @@ exports.arxivupdate = onMessagePublished({
         const latestPaper = res.docs[0].data();
         functions.logger.info(`arxivupdate: most recent article in the database is ${latestPaper.arxiv}.`);
         // filter papers more recent than latest in the articles collection and add them
-        fetchArxiv(0, 100).then((articles) => {
+        fetchArxiv(0, NUM_ARTICLES_ARXIV_FETCH).then((articles) => {
           functions.logger.info(`arxivupdate: comparing ${latestPaper.arxiv} to (${articles.slice(-1)[0].arxiv}, ${articles[0].arxiv})`)
           const articlesToAdd = res.empty
               ? articles
               : articles.filter((article) => article.arxiv > latestPaper.arxiv);
 
-              functions.logger.info(`arxivupdate: ${articlesToAdd.length} articles are new.`);
+              if (articlesToAdd.length >= NUM_ARTICLES_ARXIV_FETCH) {
+                functions.logger.warn(`arxivupdate: NUM_ARTICLES_ARXIV_FETCH (= ${NUM_ARTICLES_ARXIV_FETCH}) or more new articles found in arXiv. Some might have been missed.`);
+              } else {
+                functions.logger.info(`arxivupdate: ${articlesToAdd.length} articles are new.`);
+            }
+              
           uploadArticles(articlesToAdd);
         });
     });
