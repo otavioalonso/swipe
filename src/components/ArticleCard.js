@@ -46,11 +46,11 @@ export default function ArticleCard({
       </div>
       <div className="card-footer">
         <a
-          href={`/pdf/${arxiv}`}
+          href={`https://arxiv.org/html/${arxiv}`}
           className="btn btn-primary mx-2"
           target="_blank"
         >
-          View PDF
+          View HTML
         </a>
         <a
           href={`https://arxiv.org/abs/${arxiv}`}
