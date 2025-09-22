@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import {
   LeadingActions,
@@ -20,6 +20,7 @@ import dateFormat from "dateformat";
 
 export default function ArticleSwiper(props) {
   const [articles, setArticles] = useState([]);
+  const cardRefs = useRef({});
   const [isFetching, setIsFetching, hasMore, setHasMore] =
     useInfiniteScroll(fetchMoreArticles);
 
@@ -48,6 +49,10 @@ export default function ArticleSwiper(props) {
         <SwipeAction
           destructive={true}
           onClick={() => {
+            // Scroll the card into view
+            if (cardRefs.current[article.arxiv]) {
+              cardRefs.current[article.arxiv].scrollIntoView({ behavior: "smooth", block: "start" });
+            }
             window.dispatchEvent(new Event("scroll"));
             if ("onSwipeRight" in props && props.onSwipeRight)
               return props.onSwipeRight(article);
@@ -65,6 +70,10 @@ export default function ArticleSwiper(props) {
         <SwipeAction
           destructive={true}
           onClick={() => {
+            // Scroll the card into view
+            if (cardRefs.current[article.arxiv]) {
+              cardRefs.current[article.arxiv].scrollIntoView({ behavior: "smooth", block: "start" });
+            }
             window.dispatchEvent(new Event("scroll"));
             if ("onSwipeLeft" in props && props.onSwipeLeft)
               return props.onSwipeLeft(article);
@@ -84,6 +93,7 @@ export default function ArticleSwiper(props) {
             key={article.arxiv}
             leadingActions={leadingActions(article)}
             trailingActions={trailingActions(article)}
+            ref={el => { cardRefs.current[article.arxiv] = el; }}
           >
             <ArticleCard
               title={article.title}
