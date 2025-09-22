@@ -16,7 +16,7 @@ exports.arxivupdate = onMessagePublished({
     maxInstances: 1,
     concurrency: 1,
     cpu: 1,
-    memory: "256MB",
+    memory: "1024MB",
     timeoutSeconds: 60,
     region: "us-central1",
     onTimeout: () => {
