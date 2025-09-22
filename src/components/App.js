@@ -1,4 +1,3 @@
-import React from "react";
 
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
@@ -14,7 +13,6 @@ import UpdateProfile from "./UpdateProfile";
 import AccountPage from "./AccountPage";
 
 import Dashboard from "./Dashboard";
-import ArticleViewer from "./ArticleViewer";
 
 export default function App() {
   return (
@@ -89,7 +87,6 @@ export default function App() {
                 </AccountPage>
               }
             />
-            <Route exact path="/pdf/:arxiv" element={<ArticleViewer />} />
           </Routes>
         </LogProvider>
       </AuthProvider>

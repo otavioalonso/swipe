@@ -1,4 +1,4 @@
-import React from "react";
+
 import "./ArticleCard.css";
 
 import { decode } from "html-entities";
