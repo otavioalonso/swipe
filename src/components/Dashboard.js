@@ -235,7 +235,7 @@ export default function Dashboard({ folder }) {
       <ArticleSwiper
         articleLoader={getArticleLoader}
         folder={currentFolder}
-        onLoad={currentFolder == "inbox" && addNewArticles}
+        onLoad={currentFolder === "inbox" && addNewArticles}
         onSwipeLeft={
           ["inbox", "archive"].includes(currentFolder) &&
           ((article) => moveArticle(article, currentFolder, "trash"))

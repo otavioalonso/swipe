@@ -9,7 +9,7 @@ import "katex/dist/katex.min.css";
 function textToKatex(text) {
   const textSplit = decode(text).split("$");
 
-  if (textSplit.length % 2 == 1) {
+  if (textSplit.length % 2 === 1) {
     return (
       <>
         {textSplit.map((t, i) =>
