@@ -131,7 +131,7 @@ export default function Dashboard({ folder }) {
         } else {
           // If user doesn't exist, it will be created later
           user = { lastAdded: "0000.00000" };
-          log("User not in database. Creating new user.");
+          log("User not in database. Registering new user.");
         }
 
         let query_array = [];
@@ -149,7 +149,7 @@ export default function Dashboard({ folder }) {
             const batch = writeBatch(db);
             const articles = res.docs.map((e) => e.data());
             log(
-              `Found ${articles.length} new articles! Adding them to my inbox.`
+              `Found ${articles.length} new articles! Adding them to your inbox.`
             );
 
             articles.map((article) => {
