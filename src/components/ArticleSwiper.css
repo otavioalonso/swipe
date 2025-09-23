@@ -1,3 +1,11 @@
+/* Center the card wrapper using flexbox */
+.article-card-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
 .swipeable-list-item {
   max-height: 2000px;
 }

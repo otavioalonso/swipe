@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import {
   LeadingActions,
@@ -21,8 +21,17 @@ import dateFormat from "dateformat";
 export default function ArticleSwiper(props) {
   const [articles, setArticles] = useState([]);
   const cardRefs = useRef({});
+  const [focusOn, setFocusOn] = useState(null);
   const [isFetching, setIsFetching, hasMore, setHasMore] =
     useInfiniteScroll(fetchMoreArticles);
+
+  // Scroll into view after articles update
+  useEffect(() => {
+    if (focusOn && cardRefs.current[focusOn]) {
+      cardRefs.current[focusOn].scrollIntoView({ behavior: "smooth", block: "start" });
+      setFocusOn(null);
+    }
+  }, [articles, focusOn]);
 
   useEffect(
     () => {
@@ -49,10 +58,7 @@ export default function ArticleSwiper(props) {
         <SwipeAction
           destructive={true}
           onClick={() => {
-            // Scroll the card into view
-            if (cardRefs.current[article.arxiv]) {
-              cardRefs.current[article.arxiv].scrollIntoView({ behavior: "smooth", block: "start" });
-            }
+            setFocusOn(article.arxiv);
             window.dispatchEvent(new Event("scroll"));
             if ("onSwipeRight" in props && props.onSwipeRight)
               return props.onSwipeRight(article);
@@ -70,10 +76,7 @@ export default function ArticleSwiper(props) {
         <SwipeAction
           destructive={true}
           onClick={() => {
-            // Scroll the card into view
-            if (cardRefs.current[article.arxiv]) {
-              cardRefs.current[article.arxiv].scrollIntoView({ behavior: "smooth", block: "start" });
-            }
+            setFocusOn(article.arxiv);
             window.dispatchEvent(new Event("scroll"));
             if ("onSwipeLeft" in props && props.onSwipeLeft)
               return props.onSwipeLeft(article);
@@ -87,27 +90,31 @@ export default function ArticleSwiper(props) {
 
   return (
     <>
-      <SwipeableList fullSwipe threshold={0.2}>
+      <SwipeableList fullSwipe threshold={0.2} destructiveCallbackDelay={0}>
         {articles.map((article) => (
           <SwipeableListItem
             key={article.arxiv}
             leadingActions={leadingActions(article)}
             trailingActions={trailingActions(article)}
-            ref={el => { cardRefs.current[article.arxiv] = el; }}
           >
-            <ArticleCard
-              title={article.title}
-              abstract={article.abstract}
-              avatar={
-                "https://static.vecteezy.com/system/resources/previews/004/980/452/non_2x/astrophysics-blue-violet-flat-design-long-shadow-glyph-icon-astronomy-branch-study-of-universe-stars-planets-galaxies-astrophysical-discoveries-cosmology-silhouette-illustration-vector.jpg"
-              }
-              authors={article.authors.join(", ")}
-              arxiv={article.arxiv}
-              published={dateFormat(
-                article.published.toDate(),
-                "DDDD, mmmm d, yyyy"
-              )}
-            />
+            <div
+              className="article-card-wrapper"
+              ref={el => { cardRefs.current[article.arxiv] = el; }}
+            >
+              <ArticleCard
+                title={article.title}
+                abstract={article.abstract}
+                avatar={
+                  "https://static.vecteezy.com/system/resources/previews/004/980/452/non_2x/astrophysics-blue-violet-flat-design-long-shadow-glyph-icon-astronomy-branch-study-of-universe-stars-planets-galaxies-astrophysical-discoveries-cosmology-silhouette-illustration-vector.jpg"
+                }
+                authors={article.authors.join(", ")}
+                arxiv={article.arxiv}
+                published={dateFormat(
+                  article.published.toDate(),
+                  "DDDD, mmmm d, yyyy"
+                )}
+              />
+            </div>
           </SwipeableListItem>
         ))}
       </SwipeableList>
