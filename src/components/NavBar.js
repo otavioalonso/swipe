@@ -13,27 +13,37 @@ export default function NavBar(props) {
     try {
       await logout();
       navigate("/login");
-    } catch {
-      log("Error: Failed to log out", true);
+    } catch (error) {
+      log('Failed to log out.', true);
+      log(`Error: ${error.message}`, true);
     }
   }
 
   return (
     <nav className="navbar navbar-expand-md flex-column">
+      {!currentUser.isAnonymous && (
       <div className="flex-row">
-        <h6 className="navbar-text container" style={{ textAlign: "center" }}>
-          <strong>User:</strong> {currentUser.email}
-        </h6>
+          <h6 className="navbar-text container" style={{ textAlign: "center" }}>
+            <strong>User:</strong> {currentUser.email}
+          </h6>
       </div>
+        )}
       <div className="flex-column">
+        {!currentUser.isAnonymous && 
         <a href="/update-profile" className="btn btn-outline-primary mx-2 my-2">
           Update Profile
         </a>
+        }
+        {currentUser.isAnonymous && 
+        <a href="/signup" className="btn btn-outline-primary mx-2 my-2">
+          Register Account
+        </a>
+        }
         <button
           className="btn btn-outline-danger mx-2 my-2"
           onClick={handleLogout}
         >
-          Log Out
+          {currentUser.isAnonymous ? 'End Guest Session' : 'Log Out'}
         </button>
       </div>
       <ul className="nav nav-pills nav-fill mt-3 mb-0">

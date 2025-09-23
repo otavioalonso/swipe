@@ -1,0 +1,90 @@
+.auth-bg {
+  min-height: 100vh;
+  min-width: 100vw;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(120deg, #f8fafc 0%, #e0e7ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+.auth-card {
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  border-radius: 18px;
+  padding: 2.5rem 2rem;
+  background: #fff;
+  animation: fadeIn 0.7s;
+  width: 100%;
+  max-width: 400px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-card h2 {
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #3730a3;
+}
+
+.auth-card .form-group {
+  margin-bottom: 1.2rem;
+}
+
+.auth-card .form-label {
+  font-weight: 500;
+  color: #6366f1;
+}
+
+.auth-card .form-control {
+  border-radius: 8px;
+  border: 1px solid #e0e7ff;
+  padding: 0.7rem;
+  font-size: 1rem;
+}
+
+.auth-card .btn-primary {
+  background: linear-gradient(90deg, #6366f1 0%, #3730a3 100%);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+}
+
+.auth-card .btn-primary:hover {
+  background: linear-gradient(90deg, #3730a3 0%, #6366f1 100%);
+}
+
+.auth-card .btn-secondary {
+  border-radius: 8px;
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
+.auth-card .alert {
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.auth-card .forgot-link,
+.auth-card .signup-link {
+  color: #6366f1;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.auth-card .forgot-link:hover,
+.auth-card .signup-link:hover {
+  color: #3730a3;
+}

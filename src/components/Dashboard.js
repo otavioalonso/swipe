@@ -119,7 +119,7 @@ export default function Dashboard({ folder }) {
   }
 
   function addNewArticles() {
-    log("Checking new articles.");
+    log("Checking for new articles.");
     return new Promise((resolve) => {
       const userDoc = doc(db, "users", currentUser.uid);
 
@@ -131,7 +131,7 @@ export default function Dashboard({ folder }) {
         } else {
           // If user doesn't exist, it will be created later
           user = { lastAdded: "0000.00000" };
-          log("User not in database.");
+          log("User not in database. Creating new user.");
         }
 
         let query_array = [];
@@ -225,7 +225,7 @@ export default function Dashboard({ folder }) {
       });
     });
   }
-
+  
   return (
     <>
       <NavBar

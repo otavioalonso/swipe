@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
-import { auth } from "../firebase";
+import { auth, db, EmailAuthProvider } from "../firebase";
+import { doc, deleteDoc } from "firebase/firestore";
 
 const AuthContext = React.createContext();
 
@@ -15,11 +16,33 @@ export function AuthProvider({ children }) {
     return auth.createUserWithEmailAndPassword(email, password);
   }
 
+  // Link anonymous account to permanent account
+  function linkAnonymousAccount(email, password) {
+  const credential = EmailAuthProvider.credential(email, password);
+    if (!currentUser || !currentUser.isAnonymous) {
+      return Promise.reject(new Error("No anonymous user to link."));
+    }
+    return currentUser.linkWithCredential(credential);
+  }
+
   function login(email, password) {
     return auth.signInWithEmailAndPassword(email, password);
   }
 
   function logout() {
+    // If user is anonymous, delete their Firestore data and Auth user
+    if (currentUser && currentUser.isAnonymous) {
+      const userDocRef = doc(db, "users", currentUser.uid);
+      // Delete Firestore user data
+      deleteDoc(userDocRef).catch((error) => {
+        console.error('Error deleting Firestore user data:', error);
+      });
+      // Delete Auth user
+      return currentUser.delete().catch((error) => {
+        console.error('Error deleting anonymous Auth user:', error);
+      }).then(() => auth.signOut());
+    }
+    // Regular logout
     return auth.signOut();
   }
 
@@ -35,6 +58,10 @@ export function AuthProvider({ children }) {
     return currentUser.updatePassword(password);
   }
 
+  function signInAnonymously() {
+    return auth.signInAnonymously();
+  }
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setCurrentUser(user);
@@ -44,6 +71,7 @@ export function AuthProvider({ children }) {
     return unsubscribe;
   }, []);
 
+
   const value = {
     currentUser,
     login,
@@ -52,6 +80,8 @@ export function AuthProvider({ children }) {
     resetPassword,
     updateEmail,
     updatePassword,
+    signInAnonymously,
+    linkAnonymousAccount,
   };
 
   return (
