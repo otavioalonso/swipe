@@ -8,10 +8,21 @@ export default function Signup() {
   const emailRef = useRef();
   const passwordRef = useRef();
   const passwordConfirmRef = useRef();
-  const { signup, currentUser, linkAnonymousAccount } = useAuth();
+  const { signup, currentUser, linkAnonymousAccount, logout } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  async function handleLogout() {
+    try {
+      await logout();
+      navigate("/signup");
+    } catch (error) {
+      setError("Failed to destroy guest session.");
+      console.error(error);
+    }
+    setLoading(false);
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -50,16 +61,7 @@ export default function Signup() {
                 className="signup-link"
                 disabled={loading}
                 style={{ textDecoration: "underline" }}
-                onClick={async () => {
-                  setLoading(true);
-                  try {
-                    await useAuth().logout();
-                    navigate("/");
-                  } catch (err) {
-                    setError("Failed to destroy guest session.");
-                  }
-                  setLoading(false);
-                }}
+                onClick={handleLogout}
               >
                 Start fresh
               </Button>
