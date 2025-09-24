@@ -1,3 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+/* Apply Inter font to all text and buttons */
+body, .article-card, .card-title, .card-text, .navbar-text, .nav-link, button, input, textarea, .btn-primary, .btn-outline-primary, .btn-outline-danger {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
 
 .article-card-wrapper {
 		width: 100%;
@@ -21,17 +27,25 @@
     margin-top: 0px;
 }
 
-.swipeable-list-item {
-  max-height: 3000px;
+
+/* Overwrites for react-swipeable-list styles */
+.swiper .swipeable-list-item {
+  position: relative;
+  transition: max-height 0.5s ease;
+  max-height: 4000px; /* Increased max-height to accommodate larger content */
+  transform-origin: top;
+  overflow: hidden;
+  width: 100%;
 }
 
-
-.swipeable-list-item--remove {
+.swiper .swipeable-list-item--remove {
   max-height: 0;
+  transition: max-height 0.35s ease-out;
+  opacity: 0.2;
 }
 
 .card {
-    overflow: hidden;
+    /* overflow: hidden; */
     min-height: 450px;
     max-width: 500px;
     box-shadow: 0 0 15px rgba(10, 10, 10, 0.3);
@@ -72,8 +86,7 @@
 	color: #555;
 	margin: 4px 0;
 	display: block;
-	max-height: 2500px;
-	overflow-y: visible;
+  overflow-y: visible;
 	user-select: none;
 	cursor: default;
 }
@@ -111,6 +124,15 @@
 	background: transparent;
 	color: #007bff;
 	border: 1px solid #007bff;
+	border-radius: 4px;
+	padding: 6px 12px;
+	cursor: pointer;
+}
+
+.btn-outline-danger {
+	background: transparent;
+	color: #dc3545;
+	border: 1px solid #dc3545;
 	border-radius: 4px;
 	padding: 6px 12px;
 	cursor: pointer;
@@ -169,15 +191,6 @@
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
-}
-
-.btn-outline-danger {
-	background: transparent;
-	color: #dc3545;
-	border: 1px solid #dc3545;
-	border-radius: 4px;
-	padding: 6px 12px;
-	cursor: pointer;
 }
 
 .nav-pills {
