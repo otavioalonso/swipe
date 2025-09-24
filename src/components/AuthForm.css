@@ -12,6 +12,7 @@
   top: 0;
   left: 0;
   z-index: 0;
+  font-family: 'Inter', 'Segoe UI', 'Arial', sans-serif;
 }
 
 .auth-card {
@@ -20,8 +21,9 @@
   padding: 2.5rem 2rem;
   background: #fff;
   animation: fadeIn 0.7s;
-  width: 100%;
+  width: 70%;
   max-width: 400px;
+  text-align: center;
 }
 
 @keyframes fadeIn {
@@ -33,15 +35,19 @@
   font-weight: 700;
   margin-bottom: 1.5rem;
   color: #3730a3;
+  text-align: center;
 }
 
 .auth-card .form-group {
-  margin-bottom: 1.2rem;
+  margin-bottom: 1rem;
+  text-align: left;
 }
 
 .auth-card .form-label {
-  font-weight: 500;
+  font-weight: 700;
   color: #6366f1;
+  margin-bottom: 0.3rem;
+  display: block;
 }
 
 .auth-card .form-control {
@@ -49,16 +55,25 @@
   border: 1px solid #e0e7ff;
   padding: 0.7rem;
   font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .auth-card .btn-primary {
   background: linear-gradient(90deg, #6366f1 0%, #3730a3 100%);
-  border: none;
+}
+
+.auth-card .btn {
   border-radius: 8px;
+  cursor: pointer;
+  color: #fff;
   font-weight: 600;
+  transition: background 0.2s;
+  padding: 0.8rem 0;
+  width: 100%;
+  border: none;
   font-size: 1.1rem;
   margin-top: 0.5rem;
-  transition: background 0.2s;
 }
 
 .auth-card .btn-primary:hover {
@@ -66,14 +81,33 @@
 }
 
 .auth-card .btn-secondary {
-  border-radius: 8px;
-  font-weight: 500;
-  margin-top: 0.5rem;
+  background-color: #727272;
+}
+.auth-card .btn-secondary:hover {
+  background-color: #5a5a5a;
+}
+
+.auth-card .btn-link, .auth-card .link {
+  background: none;
+  border: none;
+  color: #474af3;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font-size: 1rem;
+  transition: color 0.2s;
+  font-size: 1.1rem;
 }
 
 .auth-card .alert {
   border-radius: 8px;
   margin-bottom: 1rem;
+  padding: 0.8rem;
+  font-size: 1rem;
+  color: #b91c1c;
+  background-color: #fee2e2;
+  border: 1px solid #fca5a5;
 }
 
 .auth-card .forgot-link,
@@ -87,4 +121,11 @@
 .auth-card .forgot-link:hover,
 .auth-card .signup-link:hover {
   color: #3730a3;
+}
+
+.auth-card .text-center {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 1rem;
+  margin-bottom: 1rem;
 }

@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Form, Button, Card, Alert } from "react-bootstrap";
+// ...existing code...
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import "./AuthForm.css";
@@ -44,48 +44,51 @@ export default function UpdateProfile() {
 
   return (
     <div className="auth-bg">
-      <Card className="auth-card">
-        <Card.Body>
+      <div className="auth-card">
+        <div className="card-body">
           <h2 className="text-center">Update Profile</h2>
-          {error && <Alert variant="danger">{error}</Alert>}
-          <Form onSubmit={handleSubmit}>
-            <Form.Group className="form-group" id="email">
-              <Form.Label className="form-label">Email</Form.Label>
-              <Form.Control
+          {error && <div className="alert alert-danger auth-card__alert">{error}</div>}
+          <form onSubmit={handleSubmit}>
+            <div className="form-group" id="email">
+              <label className="form-label" htmlFor="update-email">Email</label>
+              <input
                 className="form-control"
+                id="update-email"
                 type="email"
                 ref={emailRef}
                 required
                 defaultValue={currentUser.email}
               />
-            </Form.Group>
-            <Form.Group className="form-group" id="password">
-              <Form.Label className="form-label">Password</Form.Label>
-              <Form.Control
+            </div>
+            <div className="form-group" id="password">
+              <label className="form-label" htmlFor="update-password">Password</label>
+              <input
                 className="form-control"
+                id="update-password"
                 type="password"
                 ref={passwordRef}
                 placeholder="Leave blank to keep the same"
               />
-            </Form.Group>
-            <Form.Group className="form-group" id="password-confirm">
-              <Form.Label className="form-label">Password Confirmation</Form.Label>
-              <Form.Control
+            </div>
+            <div className="form-group" id="password-confirm">
+              <label className="form-label" htmlFor="update-password-confirm">Password Confirmation</label>
+              <input
                 className="form-control"
+                id="update-password-confirm"
                 type="password"
                 ref={passwordConfirmRef}
                 placeholder="Leave blank to keep the same"
               />
-            </Form.Group>
-            <Button disabled={loading} className="btn-primary w-100" type="submit">
+            </div>
+            <button disabled={loading} className="btn btn-primary" type="submit">
               Update
-            </Button>
-          </Form>
-          <div className="text-center mt-3">
+            </button>
+          </form>
+          <div className="text-center">
             <Link className="forgot-link" to="/">Cancel</Link>
           </div>
-        </Card.Body>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

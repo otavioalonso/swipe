@@ -11,11 +11,10 @@ import {
 import useInfiniteScroll from "./InfiniteScroll";
 
 import "react-swipeable-list/dist/styles.css";
-import "bootstrap/dist/css/bootstrap.min.css";
-
 import "./ArticleSwiper.css";
 
 import ArticleCard from "./ArticleCard";
+
 import dateFormat from "dateformat";
 
 export default function ArticleSwiper(props) {
@@ -89,7 +88,7 @@ export default function ArticleSwiper(props) {
   }
 
   return (
-    <>
+    <div className="swiper">
       <SwipeableList fullSwipe threshold={0.2} destructiveCallbackDelay={0}>
         {articles.map((article) => (
           <SwipeableListItem
@@ -121,11 +120,11 @@ export default function ArticleSwiper(props) {
       {isFetching && <div className="loader"></div>}
       {!hasMore && (
         <>
-          <div className="end" style={{ color: "#aaa" }}>
+          <div className="end">
             No more articles
           </div>
         </>
       )}
-    </>
+    </div>
   );
 }

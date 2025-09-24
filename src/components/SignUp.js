@@ -1,5 +1,4 @@
 import { useRef, useState } from "react";
-import { Form, Button, Card, Alert } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import "./AuthForm.css";
@@ -49,57 +48,53 @@ export default function Signup() {
 
   return (
     <div className="auth-bg">
-      <Card className="auth-card">
-        <Card.Body>
-          <h2 className="text-center">Sign Up</h2>
-          {error && <Alert variant="danger">{error}</Alert>}
+      <div className="auth-card">
+        <div className="card-body">
+          <h2>Sign Up</h2>
+          {error && <div className="alert alert-danger auth-card__alert">{error}</div>}
           {currentUser && currentUser.isAnonymous && (
-            <div className="text-center mt-2">
+            <div className="text-center">
               <span>This will link your current session to a new account. </span>
-              <Button
-                variant="link"
-                className="signup-link"
+              <button
+                className="btn btn-link signup-link"
                 disabled={loading}
                 style={{ textDecoration: "underline" }}
                 onClick={handleLogout}
               >
                 Start fresh
-              </Button>
+              </button>
             </div>
-        )}
-          <Form onSubmit={handleSubmit}>
-            <Form.Group className="form-group" id="email">
-              <Form.Label className="form-label">Email</Form.Label>
-              <Form.Control className="form-control" type="email" ref={emailRef} required />
-            </Form.Group>
-            <Form.Group className="form-group" id="password">
-              <Form.Label className="form-label">Password</Form.Label>
-              <Form.Control className="form-control" type="password" ref={passwordRef} required />
-            </Form.Group>
-            <Form.Group className="form-group" id="password-confirm">
-              <Form.Label className="form-label">Password Confirmation</Form.Label>
-              <Form.Control className="form-control" type="password" ref={passwordConfirmRef} required />
-            </Form.Group>
-            <Button disabled={loading} className="btn-primary w-100" type="submit">
+          )}
+          <form onSubmit={handleSubmit}>
+            <div className="form-group" id="email">
+              <label className="form-label" htmlFor="signup-email">Email</label>
+              <input className="form-control" id="signup-email" type="email" ref={emailRef} required />
+            </div>
+            <div className="form-group" id="password">
+              <label className="form-label" htmlFor="signup-password">Password</label>
+              <input className="form-control" id="signup-password" type="password" ref={passwordRef} required />
+            </div>
+            <div className="form-group" id="password-confirm">
+              <label className="form-label" htmlFor="signup-password-confirm">Password Confirmation</label>
+              <input className="form-control" id="signup-password-confirm" type="password" ref={passwordConfirmRef} required />
+            </div>
+            <button disabled={loading} className="btn btn-primary" type="submit">
               Sign Up
-            </Button>
+            </button>
             {currentUser && (
-              <Button disabled={loading}
-                variant="secondary" className="btn-secondary w-100" type="button" onClick={() => navigate("/")}>
+              <button disabled={loading} className="btn btn-secondary" type="button" onClick={() => navigate("/")}>
                 Back
-              </Button>
+              </button>
             )}
-          </Form>
-        </Card.Body>
-
+          </form>
+        </div>
         {!currentUser && (
-          <div className="text-center mt-2">
+          <div className="text-center">
             <span>Already have an account? </span>
-            <Link className="signup-link" to="/login">Log In</Link>
+            <Link className="link" to="/login">Log In</Link>
           </div>
         )}
-
-      </Card>
+      </div>
     </div>
   );
 }

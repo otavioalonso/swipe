@@ -22,6 +22,8 @@ import ArticleSwiper from "./ArticleSwiper";
 import { useAuth } from "../contexts/AuthContext";
 import { useLog } from "../contexts/LogContext";
 
+import "./ArticleSwiper.css";
+
 const cardsPerScroll = 10;
 
 export default function Dashboard({ folder }) {

@@ -1,15 +1,12 @@
 import React from "react";
-import { Container } from "react-bootstrap";
+// ...existing code...
 
 export default function AccountPage({ children }) {
   return (
-    <Container
-      className="d-flex align-items-center justify-content-center"
-      style={{ minHeight: "100vh" }}
-    >
+  <div className="account-container" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div className="w-100" style={{ maxWidth: "400px" }}>
         {children}
       </div>
-    </Container>
+    </div>
   );
 }

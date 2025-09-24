@@ -1,10 +1,9 @@
-
-import "./ArticleCard.css";
-
 import { decode } from "html-entities";
 
 import { InlineMath } from "react-katex";
 import "katex/dist/katex.min.css";
+
+import "./ArticleSwiper.css";
 
 function textToKatex(text) {
   const textSplit = decode(text).split("$");
@@ -31,11 +30,8 @@ export default function ArticleCard({
   published,
 }) {
   return (
-    <div className="card bg-white border-white border-0">
+    <div className="article-card">
       <div className="card-img"></div>
-      <div className="card-avatar">
-        <img className="img-fluid" src={avatar} alt="Avatar" />
-      </div>
       <div className="card-body">
         <div className="card-header">
           <h4 className="card-title">{textToKatex(title)}</h4>
@@ -45,20 +41,18 @@ export default function ArticleCard({
         <p className="card-text">{textToKatex(abstract)}</p>
       </div>
       <div className="card-footer">
-        <a
-          href={`https://arxiv.org/html/${arxiv}`}
-          className="btn btn-primary mx-2"
-          target="_blank"
+        <button
+          className="btn-primary"
+          onClick={() => window.open(`https://arxiv.org/html/${arxiv}`, '_blank')}
         >
           View HTML
-        </a>
-        <a
-          href={`https://arxiv.org/abs/${arxiv}`}
-          className="btn btn-outline-primary mx-2"
-          target="_blank"
+        </button>
+        <button
+          className="btn-outline-primary"
+          onClick={() => window.open(`https://arxiv.org/abs/${arxiv}`, '_blank')}
         >
           arXiv:{arxiv}
-        </a>
+        </button>
       </div>
     </div>
   );

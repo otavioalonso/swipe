@@ -2,7 +2,8 @@
 import { useAuth } from "../contexts/AuthContext";
 import { useLog } from "../contexts/LogContext";
 import { useNavigate } from "react-router-dom";
-import "./NavBar.css";
+
+import "./ArticleSwiper.css";
 
 export default function NavBar(props) {
   const { currentUser, logout } = useAuth();
@@ -20,34 +21,40 @@ export default function NavBar(props) {
   }
 
   return (
-    <nav className="navbar navbar-expand-md flex-column">
+    <nav className="navbar">
       {!currentUser.isAnonymous && (
       <div className="flex-row">
-          <h6 className="navbar-text container" style={{ textAlign: "center" }}>
+          <h6 className="navbar-text">
             <strong>User:</strong> {currentUser.email}
           </h6>
       </div>
         )}
       <div className="flex-column">
         {!currentUser.isAnonymous && 
-        <a href="/update-profile" className="btn btn-outline-primary mx-2 my-2">
-          Update Profile
-        </a>
+          <button
+            className="btn-outline-primary"
+            onClick={() => navigate('/update-profile')}
+          >
+            Update Profile
+          </button>
         }
         {currentUser.isAnonymous && 
-        <a href="/signup" className="btn btn-outline-primary mx-2 my-2">
-          Register Account
-        </a>
+          <button
+            className="btn-outline-primary"
+            onClick={() => navigate('/signup')}
+          >
+            Register Account
+          </button>
         }
         <button
-          className="btn btn-outline-danger mx-2 my-2"
+          className="btn-outline-danger"
           onClick={handleLogout}
         >
           {currentUser.isAnonymous ? 'End Guest Session' : 'Log Out'}
         </button>
       </div>
-      <ul className="nav nav-pills nav-fill mt-3 mb-0">
-        <li className="nav-item mx-1">
+  <ul className="nav-pills">
+  <li className="nav-item">
           <button
             className={`nav-link trash ${props.folder === "trash" && "active"}`}
             onClick={() => {
@@ -58,7 +65,7 @@ export default function NavBar(props) {
             Trash
           </button>
         </li>
-        <li className="nav-item mx-1">
+  <li className="nav-item">
           <button
             className={`nav-link ${props.folder === "inbox" && "active"}`}
             onClick={() => {
@@ -69,7 +76,7 @@ export default function NavBar(props) {
             Inbox
           </button>
         </li>
-        <li className="nav-item mx-1">
+  <li className="nav-item">
           <button
             className={`nav-link archive ${
               props.folder === "archive" && "active"
@@ -84,13 +91,13 @@ export default function NavBar(props) {
         </li>
       </ul>
       <div className="flex-row">
-        <h6 className="navbar-text container" style={{ textAlign: "center" }}>
+        <div className="navbar-text">
           {logMessages.map((message, i) => (
             <p key={`message_${i}`} style={{ marginBottom: 0 }}>
               {message}
             </p>
           ))}
-        </h6>
+        </div>
       </div>
     </nav>
   );

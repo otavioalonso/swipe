@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { Form, Button, Card, Alert } from "react-bootstrap";
+// ...existing code...
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import "./AuthForm.css";
@@ -48,39 +48,39 @@ export default function Login() {
 
   return (
     <div className="auth-bg">
-      <Card className="auth-card">
-        <Card.Body>
-          <h2 className="text-center">Log In</h2>
-          {error && <Alert variant="danger">{error}</Alert>}
-          <Form onSubmit={handleSubmit}>
-            <Form.Group className="form-group" id="email">
-              <Form.Label className="form-label">Email</Form.Label>
-              <Form.Control className="form-control" type="email" ref={emailRef} required />
-            </Form.Group>
-            <Form.Group className="form-group" id="password">
-              <Form.Label className="form-label">Password</Form.Label>
-              <Form.Control className="form-control" type="password" ref={passwordRef} required />
-            </Form.Group>
-            <Button disabled={loading} className="btn-primary w-100" type="submit">
+      <div className="auth-card">
+        <div className="card-body">
+          <h2>Log In</h2>
+          {error && <div className="alert alert-danger auth-card__alert">{error}</div>}
+          <form onSubmit={handleSubmit}>
+            <div className="form-group" id="email">
+              <label className="form-label" htmlFor="login-email">Email</label>
+              <input className="form-control" id="login-email" type="email" ref={emailRef} required />
+            </div>
+            <div className="form-group" id="password">
+              <label className="form-label" htmlFor="login-password">Password</label>
+              <input className="form-control" id="login-password" type="password" ref={passwordRef} required />
+            </div>
+            <button disabled={loading} className="btn btn-primary w-100" type="submit">
               Log In
-            </Button>
-            <Button
-              variant="secondary"
-              className="btn-secondary w-100 mt-2"
+            </button>
+            <button
+              className="btn btn-secondary"
+              type="button"
               onClick={handleGuestLogin}
             >
               Continue as Guest
-            </Button>
-          </Form>
-          <div className="text-center mt-3">
-            <Link className="forgot-link" to="/forgot-password">Forgot Password?</Link>
+            </button>
+          </form>
+          <div className="text-center">
+            <Link className="link" to="/forgot-password">Forgot Password?</Link>
           </div>
-        </Card.Body>
-        <div className="text-center mt-2">
-          <span>Need an account? </span>
-          <Link className="signup-link" to="/signup">Sign Up</Link>
         </div>
-      </Card>
+        <div className="text-center">
+          <span>Need an account? </span>
+          <Link className="link" to="/signup">Sign Up</Link>
+        </div>
+      </div>
     </div>
   );
 }
