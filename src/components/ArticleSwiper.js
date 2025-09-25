@@ -120,7 +120,7 @@ export default function ArticleSwiper(props) {
         {!hasMore && (
           <>
             <div className="end">
-              No more articles
+              <span>No more articles</span>
             </div>
           </>
         )}
