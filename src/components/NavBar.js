@@ -11,6 +11,7 @@ export default function NavBar(props) {
   const navigate = useNavigate();
 
   async function handleLogout() {
+    log(currentUser.isAnonymous ? 'Ending guest session...' : 'Logging out...');
     try {
       await logout();
       navigate("/login");
@@ -30,20 +31,26 @@ export default function NavBar(props) {
       <div className="controller-body">
         <div className="dpad">
           <button className={`dpad-btn left ${props.folder === "trash" ? "active" : ""}`} aria-label="Left" onClick={() => {
+              log('Showing papers swiped left.');
               props.setFolder("trash");
-              window.history.replaceState(null, "Cosmopapers", "/trash");
+              window.history.replaceState(null, "swipe", "/trash");
             }}>&lt;-</button>
           <button className={`dpad-btn center ${props.folder === "inbox" ? "active" : ""}`} aria-label="Center" onClick={() => {
+              log('Showing inbox.');
               props.setFolder("inbox");
-              window.history.replaceState(null, "Cosmopapers", "/inbox");
+              window.history.replaceState(null, "swipe", "/inbox");
             }}>🕊</button>
           <button className={`dpad-btn right ${props.folder === "archive" ? "active" : ""}`} aria-label="Right" onClick={() => {
+              log('Showing papers swiped right.');
               props.setFolder("archive");
-              window.history.replaceState(null, "Cosmopapers", "/archive");
+              window.history.replaceState(null, "swipe", "/archive");
             }}>-&gt;</button>
         </div>
         <div className="controller-buttons">
-          <button className="btn-e" aria-label="E" onClick={() => navigate(currentUser.isAnonymous ? '/signup' : '/update-profile')}>{currentUser.isAnonymous ? '🐣' : '🐥'}</button>
+          <button className="btn-e" aria-label="E" onClick={() => {
+            log(currentUser.isAnonymous ? 'Registering anonymous user.' : 'Editing profile.');
+            navigate(currentUser.isAnonymous ? '/signup' : '/update-profile');
+          }}>{currentUser.isAnonymous ? '🐣' : '🐥'}</button>
           <button className="btn-x" aria-label="X" onClick={handleLogout}>X</button>
         </div>
       </div>
