@@ -318,6 +318,7 @@ html::-webkit-scrollbar {
   font-size: 1.2em;
   border: 2px solid #b71c1c;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  cursor: pointer;
 }
 .btn-e {
   background-color: #2196f3;
@@ -331,6 +332,7 @@ html::-webkit-scrollbar {
   text-anchor: middle;
   border: 2px solid #0d47a1;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  cursor: pointer;
 }
 
 .controller-info {
