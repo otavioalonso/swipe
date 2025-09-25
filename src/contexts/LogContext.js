@@ -9,7 +9,7 @@ export function useLog() {
 export function LogProvider({ children }) {
   const [logMessages, setLogMessages] = useState([]);
 
-  function log(text, error=false, timeout=5000) {
+  function log(text, error=false, timeout=10000) {
     console.log(text);
     setLogMessages((prev) => [
       ...prev,
