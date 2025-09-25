@@ -81,7 +81,7 @@ export default function Dashboard({ folder }) {
         } else {
           // If user doesn't exist, it will be created later
           user = { lastAdded: "0000.00000" };
-          log("Registering new user.");
+          log("Welcome to swipe papers! You can now start swiping to sort papers into the left and right folders.", timeout=15000);
         }
 
         let query_array = [];

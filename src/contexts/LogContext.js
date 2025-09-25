@@ -9,13 +9,13 @@ export function useLog() {
 export function LogProvider({ children }) {
   const [logMessages, setLogMessages] = useState([]);
 
-  function log(text, error) {
+  function log(text, error=false, timeout=5000) {
     console.log(text);
     setLogMessages((prev) => [
       ...prev,
       error ? <span style={{ color: "red" }}>{text}</span> : text,
     ]);
-    setTimeout(() => setLogMessages((prev) => prev.slice(1)), 5000);
+    setTimeout(() => setLogMessages((prev) => prev.slice(1)), timeout);
   }
 
   return (
