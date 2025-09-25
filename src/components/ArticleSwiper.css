@@ -79,7 +79,7 @@ html::-webkit-scrollbar {
 .swiper .swipeable-list-item {
   position: relative;
   transition: max-height 0.5s ease;
-  max-height: 4000px; /* Increased max-height to accommodate larger content */
+  max-height: 6000px; /* Increased max-height to accommodate larger content */
   transform-origin: top;
   overflow: hidden;
   width: 100%;
