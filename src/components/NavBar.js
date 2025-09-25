@@ -16,8 +16,8 @@ export default function NavBar(props) {
       await logout();
       navigate("/login");
     } catch (error) {
-      log('Failed to log out.', error=true);
-      log(`Error: ${error.message}`, error=true);
+      log('Failed to log out.', true);
+      log(`Error: ${error.message}`, true);
     }
   }
 
