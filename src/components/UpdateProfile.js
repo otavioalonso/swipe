@@ -46,7 +46,7 @@ export default function UpdateProfile() {
     <div className="auth-bg">
       <div className="auth-card">
         <div className="card-body">
-          <h2 className="text-center">Update Profile</h2>
+          <h2>Update Profile</h2>
           {error && <div className="alert alert-danger auth-card__alert">{error}</div>}
           <form onSubmit={handleSubmit}>
             <div className="form-group" id="email">
