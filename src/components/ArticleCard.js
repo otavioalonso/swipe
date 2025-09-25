@@ -42,13 +42,13 @@ export default function ArticleCard({
       </div>
       <div className="card-footer">
         <button
-          className="btn-primary"
+          className="btn btn-primary"
           onClick={() => window.open(`https://arxiv.org/html/${arxiv}`, '_blank')}
         >
           View HTML
         </button>
         <button
-          className="btn-outline-primary"
+          className="btn btn-secondary"
           onClick={() => window.open(`https://arxiv.org/abs/${arxiv}`, '_blank')}
         >
           arXiv:{arxiv}

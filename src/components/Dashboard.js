@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import {
   doc,
@@ -29,96 +29,44 @@ const cardsPerScroll = 10;
 export default function Dashboard({ folder }) {
   const { currentUser } = useAuth();
   const { log } = useLog();
+  const canvasRef = useRef(null);
+
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
 
   const [currentFolder, setCurrentFolder] = useState(folder);
 
-  const articleRef = collection(db, "articles");
 
-  function fetchArxiv(start, max_results) {
-    return new Promise((resolve) => {
-      log("Fetching papers from arXiv.");
-      const arxivQuery = `https://export.arxiv.org/api/query?search_query=cat:astro-ph.CO&sortBy=submittedDate&start=${start}&max_results=${max_results}`;
-      log(arxivQuery);
-
-      fetch(arxivQuery).then((response) => {
-        response.text().then((content) => {
-          const xml = new window.DOMParser().parseFromString(
-            content,
-            "text/xml"
-          );
-
-          const articles = [...xml.querySelectorAll("entry")].map((entry) => ({
-            arxiv: entry
-              .querySelector("id")
-              .innerHTML.match(/\d{4}\.\d{3,6}/)[0],
-            title: entry.querySelector("title").innerHTML.trim(),
-            abstract: entry.querySelector("summary").innerHTML.trim(),
-            authors: [...entry.querySelectorAll("author")].map((author) =>
-              author.querySelector("name").innerHTML.trim()
-            ),
-            published: new Date(entry.querySelector("published").innerHTML),
-            updated: new Date(entry.querySelector("updated").innerHTML),
-            added: new Date(Date.now()),
-            categories: [...entry.querySelectorAll("category")].map(
-              (category) => category.getAttribute("term")
-            ),
-            category: entry
-              .querySelector("primary_category")
-              .getAttribute("term"),
-            comment: entry.querySelector("comment")
-              ? entry.querySelector("comment").innerHTML
-              : "",
-          }));
-          log(
-            `Obtained ${articles.length} articles (${
-              articles.slice(-1)[0].arxiv
-            } to ${articles[0].arxiv}).`
-          );
-
-          resolve(articles);
-        });
-      });
-    });
-  }
-
-  function uploadArticles(articles) {
-    return new Promise((resolve) => {
-      log(`Uploading ${articles.length} papers to database.`);
-      try {
-        let batch = writeBatch(db);
-        articles.map((article) => {
-          batch.set(doc(articleRef, article.arxiv.replace(".", "-")), article);
-        });
-        batch.commit();
-        log(`Done.`);
-      } catch (err) {
-        log(`Error: ${err}`);
+    // Draw 10 PRINT pattern on canvas
+    useEffect(() => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      // Set canvas size to match parent
+      const parent = canvas.parentElement;
+      if (!parent) return;
+      canvas.width = parent.offsetWidth;
+      canvas.height = parent.offsetHeight;
+      const width = canvas.width;
+      const height = canvas.height;
+      ctx.clearRect(0, 0, width, height);
+      const size = 10;
+      for (let y = 0; y < height; y += size) {
+        for (let x = 0; x < width; x += size) {
+          ctx.beginPath();
+          if (Math.random() < 0.5) {
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + size, y + size);
+          } else {
+            ctx.moveTo(x + size, y);
+            ctx.lineTo(x, y + size);
+          }
+          ctx.strokeStyle = '#e0e0e0';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
       }
-      resolve();
-    });
-  }
-
-  function importArxiv() {
-    // setup query to get the latest paper in the articles collection
-    let query_array = [];
-    query_array.push(collection(db, "articles"));
-    query_array.push(orderBy("arxiv", "desc"));
-    query_array.push(limit(1));
-
-    getDocs(query(...query_array)).then((res) => {
-      const latestPaper = res.docs[0].data();
-      log(`Most recent article in the database is ${latestPaper.arxiv}.`);
-      // filter papers more recent than latest in the articles collection and add them
-      fetchArxiv(0, 100).then((articles) => {
-        const articlesToAdd = res.empty
-          ? articles
-          : articles.filter((article) => article.arxiv > latestPaper.arxiv);
-
-        log(`${articlesToAdd.length} articles are new.`);
-        uploadArticles(articlesToAdd);
-      });
-    });
-  }
+    }, []);
+  
 
   function addNewArticles() {
     log("Checking for new articles.");
@@ -133,7 +81,7 @@ export default function Dashboard({ folder }) {
         } else {
           // If user doesn't exist, it will be created later
           user = { lastAdded: "0000.00000" };
-          log("User not in database. Registering new user.");
+          log("Registering new user.");
         }
 
         let query_array = [];
@@ -227,14 +175,29 @@ export default function Dashboard({ folder }) {
       });
     });
   }
-  
+
+
+  useEffect(() => {
+    window.addEventListener("scroll", () => {
+      if (!showScrollToTop && window.scrollY > 1000) {
+        setShowScrollToTop(true);
+      } else if (showScrollToTop && window.scrollY <= 1000) {
+        setShowScrollToTop(false);
+      }
+    });
+  });
+
   return (
-    <>
+    <div className={`dashboard ${currentFolder}`}>
+        <canvas
+          ref={canvasRef}
+          className="swiper-canvas-bg"
+        />
       <NavBar
         folder={currentFolder}
         setFolder={setCurrentFolder}
       />
-      <ArticleSwiper
+      <ArticleSwiper className="article-swiper"
         articleLoader={getArticleLoader}
         folder={currentFolder}
         onLoad={currentFolder === "inbox" && addNewArticles}
@@ -247,6 +210,8 @@ export default function Dashboard({ folder }) {
           ((article) => moveArticle(article, currentFolder, "archive"))
         }
       />
-    </>
+      {showScrollToTop && <button className="scroll-to-top-btn" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>↑</button>}
+
+    </div>
   );
 }

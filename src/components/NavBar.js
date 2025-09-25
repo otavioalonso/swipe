@@ -22,82 +22,38 @@ export default function NavBar(props) {
 
   return (
     <nav className="navbar">
-      {!currentUser.isAnonymous && (
-      <div className="flex-row">
-          <h6 className="navbar-text">
-            <strong>User:</strong> {currentUser.email}
-          </h6>
-      </div>
+      {/* <div className="controller-info">
+        {!currentUser.isAnonymous && (
+          <span className="user-email">{currentUser.email}</span>
         )}
-      <div className="flex-column">
-        {!currentUser.isAnonymous && 
-          <button
-            className="btn-outline-primary"
-            onClick={() => navigate('/update-profile')}
-          >
-            Update Profile
-          </button>
-        }
-        {currentUser.isAnonymous && 
-          <button
-            className="btn-outline-primary"
-            onClick={() => navigate('/signup')}
-          >
-            Register Account
-          </button>
-        }
-        <button
-          className="btn-outline-danger"
-          onClick={handleLogout}
-        >
-          {currentUser.isAnonymous ? 'End Guest Session' : 'Log Out'}
-        </button>
-      </div>
-  <ul className="nav-pills">
-  <li className="nav-item">
-          <button
-            className={`nav-link trash ${props.folder === "trash" && "active"}`}
-            onClick={() => {
+      </div> */}
+      <div className="controller-body">
+        <div className="dpad">
+          <button className={`dpad-btn left ${props.folder === "trash" ? "active" : ""}`} aria-label="Left" onClick={() => {
               props.setFolder("trash");
               window.history.replaceState(null, "Cosmopapers", "/trash");
-            }}
-          >
-            Trash
-          </button>
-        </li>
-  <li className="nav-item">
-          <button
-            className={`nav-link ${props.folder === "inbox" && "active"}`}
-            onClick={() => {
+            }}>&lt;-</button>
+          <button className={`dpad-btn center ${props.folder === "inbox" ? "active" : ""}`} aria-label="Center" onClick={() => {
               props.setFolder("inbox");
               window.history.replaceState(null, "Cosmopapers", "/inbox");
-            }}
-          >
-            Inbox
-          </button>
-        </li>
-  <li className="nav-item">
-          <button
-            className={`nav-link archive ${
-              props.folder === "archive" && "active"
-            }`}
-            onClick={() => {
+            }}>🕊</button>
+          <button className={`dpad-btn right ${props.folder === "archive" ? "active" : ""}`} aria-label="Right" onClick={() => {
               props.setFolder("archive");
               window.history.replaceState(null, "Cosmopapers", "/archive");
-            }}
-          >
-            Archive
-          </button>
-        </li>
-      </ul>
-      <div className="flex-row">
-        <div className="navbar-text">
-          {logMessages.map((message, i) => (
-            <p key={`message_${i}`} style={{ marginBottom: 0 }}>
-              {message}
-            </p>
-          ))}
+            }}>-&gt;</button>
         </div>
+        <div className="controller-buttons">
+          <button className="btn-e" aria-label="E" onClick={() => navigate(currentUser.isAnonymous ? '/signup' : '/update-profile')}>{currentUser.isAnonymous ? '🐣' : '🐥'}</button>
+          <button className="btn-x" aria-label="X" onClick={handleLogout}>X</button>
+        </div>
+      </div>
+      <div className="controller-terminal">
+        {logMessages.map((message, i) => (
+          <p key={`message_${i}`} style={{ marginBottom: 0 }}>
+            {message}
+            {i === logMessages.length - 1 && <span className="terminal-cursor">&#9608;</span>}
+          </p>
+        ))}
       </div>
     </nav>
   );
